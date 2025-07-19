@@ -1,18 +1,17 @@
-<?php
-// You can handle form submissions here
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login/Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- Font Awesome for icons -->
     <style>
         * {
             box-sizing: border-box;
         }
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Outfit', sans-serif;
             background-color: #f5f5f5;
             display: flex;
             justify-content: center;
@@ -39,38 +38,81 @@
             font-size: 14px;
             text-align: center;
         }
+
         .btn-group {
             display: flex;
             margin-bottom: 20px;
+            position: relative;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #fff;
         }
         .btn-group button {
             flex: 1;
-            padding: 12px;
+            padding: 12px 0;
             border: none;
             cursor: pointer;
-            background-color: #ddd;
-            font-weight: bold;
+            background-color: #f5f5f5; /* Default gray background for inactive buttons */
             font-size: 14px;
+            color: #666; /* Inactive button text color */
+            text-align: center;
+            font-family: 'Outfit', sans-serif; /* Outfit font for buttons */
+            transition: all 0.3s ease;
         }
         .btn-group button.active {
-            background-color: #ffc107;
+            background-color: #eacb5f; /* Yellow color for active button */
+            color: black; /* Black text for active button */
         }
+
+        /* Icon styling for buttons */
+        .btn-group button i {
+            margin-right: 8px;
+        }
+
+        /* Yellow checkbox when checked */
+        input[type="checkbox"]:checked {
+            background-color: #eacb5f;
+            border-color: #eacb5f;
+            accent-color: #eacb5f;  /* Set checkbox checked color */
+        }
+
+        /* Forgot password text yellow */
+        .terms a {
+            font-size: 13px;
+            color: #eacb5f; /* Yellow color for link */
+            text-decoration: none;
+        }
+
         .form-wrapper {
             position: relative;
         }
+
         form {
             display: none;
             flex-direction: column;
             width: 100%;
         }
+
         form.active {
             display: flex;
         }
+
         label {
             margin-top: 15px;
-            font-weight: bold;
+            font-weight: normal;
             font-size: 13px;
         }
+
+        /* Align First Name and Last Name fields side by side */
+        .name-row {
+            display: flex;
+            gap: 15px;
+        }
+        .name-row input {
+            flex: 1;
+        }
+
         input[type="email"],
         input[type="password"],
         input[type="text"],
@@ -82,15 +124,19 @@
             border-radius: 6px;
             font-size: 14px;
             width: 100%;
+            font-family: 'Outfit', sans-serif;
         }
+
         .password-container {
             position: relative;
             width: 100%;
         }
+
         .password-container input {
             width: 100%;
-            padding-right: 40px; /* space for the eye icon */
+            padding-right: 40px; /* Space for the eye icon */
         }
+
         .password-container i {
             position: absolute;
             right: 10px;
@@ -99,13 +145,7 @@
             cursor: pointer;
             color: #888;
         }
-        .name-row {
-            display: flex;
-            gap: 15px;
-        }
-        .name-row > div {
-            flex: 1;
-        }
+
         .terms {
             margin-top: 20px;
             font-size: 13px;
@@ -113,47 +153,35 @@
             align-items: center;
             justify-content: space-between;
         }
+
         .terms label {
             display: flex;
             align-items: center;
             margin: 0;
         }
+
         .terms input[type="checkbox"] {
             margin-right: 8px;
             width: auto;
         }
-        .terms a {
-            font-size: 13px;
-            color: #007bff;
-            text-decoration: none;
-        }
-        .register-terms {
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        .register-terms label {
-            display: flex;
-            align-items: center;
-            margin: 0;
-        }
-        .register-terms input[type="checkbox"] {
-            margin-right: 8px;
-            width: auto;
-        }
-        .register-terms a {
-            color: #ffc107;
-            text-decoration: none;
-        }
+
         button[type="submit"] {
-            margin-top: 25px;
+            margin-top: 30px; /* Added space */
             padding: 12px;
-            background-color: #ffc107;
+            background-color: #eacb5f; /* Yellow color */
             border: none;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: normal;
             font-size: 14px;
             width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        button[type="submit"] i {
+            margin-right: 8px;
         }
     </style>
 </head>
@@ -164,8 +192,8 @@
     <p>Sign in to your account or create a new one</p>
 
     <div class="btn-group">
-        <button id="loginBtn" onclick="toggleForm('login')">Login</button>
-        <button id="registerBtn" class="active" onclick="toggleForm('register')">Register</button>
+        <button id="loginBtn" class="active" onclick="toggleForm('login')"><i class="fa fa-sign-in"></i>Sign In</button>
+        <button id="registerBtn" onclick="toggleForm('register')"><i class="fa fa-user-plus"></i>Register</button>
     </div>
 
     <div class="form-wrapper">
@@ -185,7 +213,7 @@
                 <a href="#">Forgot password?</a>
             </div>
 
-            <button type="submit">Sign In</button>
+            <button type="submit"><i class="fa fa-sign-in"></i>Sign In</button>
         </form>
 
         <!-- Register Form -->
@@ -226,11 +254,11 @@
                 <option value="admin">Admin</option>
             </select>
 
-            <div class="register-terms">
-                <label><input type="checkbox" name="terms"> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+            <div class="terms">
+                <label><input type="checkbox" name="agree"> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
             </div>
 
-            <button type="submit">Create Account</button>
+            <button type="submit"><i class="fa fa-user-plus"></i>Create Account</button>
         </form>
     </div>
 </div>
@@ -242,9 +270,11 @@
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
 
-        // Remove active class from all forms
+        // Remove active class from all forms and buttons
         loginForm.classList.remove('active');
         registerForm.classList.remove('active');
+        loginBtn.classList.remove('active');
+        registerBtn.classList.remove('active');
 
         if (form === 'login') {
             loginForm.classList.add('active');
@@ -252,8 +282,8 @@
             registerBtn.classList.remove('active');
         } else {
             registerForm.classList.add('active');
-            loginBtn.classList.remove('active');
             registerBtn.classList.add('active');
+            loginBtn.classList.remove('active');
         }
     }
 
@@ -262,11 +292,9 @@
         input.type = input.type === 'password' ? 'text' : 'password';
     }
 
-    // Initialize default view - show register form to match the images
-    toggleForm('register');
+    // Initialize default view - show login form
+    toggleForm('login');
 </script>
 
-<!-- Font Awesome for eye icon -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </body>
 </html>
