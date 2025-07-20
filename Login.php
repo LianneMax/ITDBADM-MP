@@ -1,3 +1,72 @@
+<?php
+session_start();
+include "includes/db.php";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    echo "<script>console.log('PWET');</script>";
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// LOGIN
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT user_id, password, user_role FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
+
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($user_id, $hashed_password, $user_role);
+        $stmt->fetch();
+
+        if (password_verify($password, $hashed_password)) {
+            $_SESSION['user_id'] = $user_id;
+            $_SESSION['user_role'] = $user_role;
+            header("Location: Index.php");
+            exit;
+        } else {
+            $login_error = "Incorrect password.";
+        }
+    } else {
+        $login_error = "No account found with that email.";
+    }
+    $stmt->close();
+}
+
+// REGISTER
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
+    $first_name = trim($_POST['firstName']);
+    $last_name = trim($_POST['lastName']);
+    $email = trim($_POST['regEmail']);
+    $password = password_hash($_POST['regPassword'], PASSWORD_DEFAULT);
+    $user_role = $_POST['accountType']; // user/admin
+
+    $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+    $check->bind_param("s", $email);
+    $check->execute();
+    $check->store_result();
+
+    if ($check->num_rows > 0) {
+        $register_error = "Email is already registered.";
+    } else {
+        $insert = $conn->prepare("INSERT INTO users (user_role, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)");
+        $insert->bind_param("sssss", $user_role, $first_name, $last_name, $email, $password);
+        if ($insert->execute()) {
+            $register_success = "Account created successfully. You can now log in.";
+        } else {
+            $register_error = "Something went wrong while creating the account.";
+        }
+        $insert->close();
+    }
+    $check->close();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
