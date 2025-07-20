@@ -33,7 +33,7 @@ if ($category_result->num_rows > 0) {
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles/product_category.css">
     <link rel="stylesheet" href="styles/product_modal.css">
-</head>    
+</head>
 <body>
 <!-- Hero Section -->
 <?php include 'includes/hero.php'; ?>
