@@ -1,0 +1,315 @@
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Host: localhost
+-- Generation Time: Jul 20, 2025 at 06:05 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
+
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Database: `pluggedin_itdbadm`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `categories`
+--
+
+CREATE TABLE `categories` (
+  `category_code` int(11) NOT NULL,
+  `category_name` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `categories`
+--
+
+INSERT INTO `categories` (`category_code`, `category_name`) VALUES
+(1, 'Headphones'),
+(2, 'Monitors'),
+(3, 'Keyboards'),
+(4, 'Mice'),
+(5, 'Speakers');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `currencies`
+--
+
+CREATE TABLE `currencies` (
+  `currency_code` int(11) NOT NULL,
+  `price_php` varchar(45) DEFAULT NULL,
+  `currency_name` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `currencies`
+--
+
+INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
+(1, '0.041', 'KRW'),
+(2, '57.24', 'USD'),
+(3, '1', 'PHP');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `isfavorite`
+--
+
+CREATE TABLE `isfavorite` (
+  `user_id` int(11) NOT NULL,
+  `product_code` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `orders`
+--
+
+CREATE TABLE `orders` (
+  `order_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `order_date` date DEFAULT NULL,
+  `totalamt_php` float NOT NULL,
+  `order_status` varchar(45) DEFAULT NULL,
+  `currency_code` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
+(2, 1, '2023-10-01', 1500, 'Processing', 1),
+(3, 2, '2023-10-02', 2500, 'Completed', 2),
+(4, 3, '2023-10-03', 1800, 'Shipped', 3),
+(5, 4, '2023-10-04', 2200, 'Processing', 3),
+(6, 5, '2023-10-05', 3000, 'Cancelled', 1),
+(7, 1, '2023-10-01', 1500, 'Processing', 1),
+(8, 2, '2023-10-02', 2500, 'Completed', 2),
+(9, 3, '2023-10-03', 1800, 'Shipped', 3),
+(10, 4, '2023-10-04', 2200, 'Processing', 3),
+(11, 5, '2023-10-05', 3000, 'Cancelled', 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_items`
+--
+
+CREATE TABLE `order_items` (
+  `order_id` int(11) NOT NULL,
+  `product_code` int(11) DEFAULT NULL,
+  `quantity` int(11) DEFAULT NULL,
+  `srp_php` float DEFAULT NULL,
+  `totalprice_php` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `payments`
+--
+
+CREATE TABLE `payments` (
+  `payment_id` int(11) NOT NULL,
+  `currency_code` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `totalamt_php` float NOT NULL,
+  `payment_status` varchar(45) NOT NULL,
+  `payment_method` varchar(45) DEFAULT NULL,
+  `payment_date` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `products`
+--
+
+CREATE TABLE `products` (
+  `product_code` int(11) NOT NULL,
+  `category_code` int(11) DEFAULT NULL,
+  `product_name` varchar(45) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `stock_qty` int(11) DEFAULT NULL,
+  `srp_php` float DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `products`
+--
+
+INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `description`, `stock_qty`, `srp_php`) VALUES
+(1, 1, 'Sony WH-1000XM4', 'Noise Cancelling Headphones', 50, 12000),
+(2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
+(3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 40, 5000),
+(4, 4, 'Razer DeathAdder', 'Gaming Mouse', 60, 3500),
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 25, 7000);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users`
+--
+
+CREATE TABLE `users` (
+  `user_id` int(11) NOT NULL,
+  `user_role` varchar(25) NOT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
+  `email` varchar(45) DEFAULT NULL,
+  `password` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`, `password`) VALUES
+(1, 'Customer', 'Alyssa', 'Mansueto', 'alyssa_mansueto@dlsu.edu.ph', 'alyssa'),
+(2, 'Customer', 'Max', 'Balbastro', 'maxbalbastro@gmail.com', 'ilovejuls'),
+(3, 'Admin', 'Brian', 'Lopez', 'brian_lopez@dlsu.edu.ph', 'brian'),
+(4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
+(5, 'Customer', 'David', 'Tan', 'david_tan@dlsu.edu.ph', 'david'),
+(6, 'Customer', 'Ella', 'Santos', 'ella_santos@dlsu.edu.ph', 'ella');
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `categories`
+--
+ALTER TABLE `categories`
+  ADD PRIMARY KEY (`category_code`);
+
+--
+-- Indexes for table `currencies`
+--
+ALTER TABLE `currencies`
+  ADD PRIMARY KEY (`currency_code`);
+
+--
+-- Indexes for table `isfavorite`
+--
+ALTER TABLE `isfavorite`
+  ADD PRIMARY KEY (`user_id`),
+  ADD KEY `product_code_idx` (`product_code`);
+
+--
+-- Indexes for table `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`order_id`),
+  ADD KEY `user_id_idx` (`user_id`),
+  ADD KEY `currency_code_idx` (`currency_code`);
+
+--
+-- Indexes for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD PRIMARY KEY (`order_id`),
+  ADD KEY `product_code_idx` (`product_code`);
+
+--
+-- Indexes for table `payments`
+--
+ALTER TABLE `payments`
+  ADD PRIMARY KEY (`payment_id`),
+  ADD KEY `currency_code_idx` (`currency_code`),
+  ADD KEY `order_id_idx` (`order_id`);
+
+--
+-- Indexes for table `products`
+--
+ALTER TABLE `products`
+  ADD PRIMARY KEY (`product_code`),
+  ADD KEY `category_code_idx` (`category_code`);
+
+--
+-- Indexes for table `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `user_id_UNIQUE` (`user_id`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `payments`
+--
+ALTER TABLE `payments`
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `isfavorite`
+--
+ALTER TABLE `isfavorite`
+  ADD CONSTRAINT `fk_isfavorite_product_code` FOREIGN KEY (`product_code`) REFERENCES `products` (`product_code`),
+  ADD CONSTRAINT `fk_isfavorite_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `orders`
+--
+ALTER TABLE `orders`
+  ADD CONSTRAINT `currency_code` FOREIGN KEY (`currency_code`) REFERENCES `currencies` (`currency_code`),
+  ADD CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+
+--
+-- Constraints for table `order_items`
+--
+ALTER TABLE `order_items`
+  ADD CONSTRAINT `fk_order_items_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`),
+  ADD CONSTRAINT `fk_order_items_product_code` FOREIGN KEY (`product_code`) REFERENCES `products` (`product_code`);
+
+--
+-- Constraints for table `payments`
+--
+ALTER TABLE `payments`
+  ADD CONSTRAINT `fk_payments_currency_code` FOREIGN KEY (`currency_code`) REFERENCES `currencies` (`currency_code`),
+  ADD CONSTRAINT `fk_payments_order_id` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
+
+--
+-- Constraints for table `products`
+--
+ALTER TABLE `products`
+  ADD CONSTRAINT `category_code` FOREIGN KEY (`category_code`) REFERENCES `categories` (`category_code`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
