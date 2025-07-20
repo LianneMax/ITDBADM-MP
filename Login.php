@@ -2,16 +2,19 @@
 session_start();
 include "includes/db.php";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    echo "<script>console.log('PWET');</script>";
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// LOGIN
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
+    // Database connection
+    $servername = "localhost";
+    $username = "root"; // Change if necessary
+    $password = ""; // Change if necessary
+    $dbname = "pluggedin_itdbadm";
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if ($conn->connect_error) {
+        die("<p style='color:red;'>Connection failed: " . $conn->connect_error . "</p>");
+    }
+
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
@@ -27,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
         if (password_verify($password, $hashed_password)) {
             $_SESSION['user_id'] = $user_id;
             $_SESSION['user_role'] = $user_role;
-            header("Location: Index.php");
+            header("refresh:2;url=Index.php");
             exit;
         } else {
             $login_error = "Incorrect password.";
@@ -38,13 +41,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $stmt->close();
 }
 
-// REGISTER
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
     $first_name = trim($_POST['firstName']);
     $last_name = trim($_POST['lastName']);
     $email = trim($_POST['regEmail']);
     $password = password_hash($_POST['regPassword'], PASSWORD_DEFAULT);
-    $user_role = $_POST['accountType']; // user/admin
+    $user_role = $_POST['accountType'];
 
     $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
     $check->bind_param("s", $email);
@@ -75,184 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
     <title>Login/Register</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"> <!-- Font Awesome for icons -->
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-        body {
-            font-family: 'Outfit', sans-serif;
-            background-color: #f5f5f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 420px;
-        }
-        h1 {
-            margin-bottom: 10px;
-            font-size: 24px;
-            text-align: center;
-        }
-        p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .btn-group {
-            display: flex;
-            margin-bottom: 20px;
-            position: relative;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            overflow: hidden;
-            background-color: #fff;
-        }
-        .btn-group button {
-            flex: 1;
-            padding: 12px 0;
-            border: none;
-            cursor: pointer;
-            background-color: #f5f5f5; /* Default gray background for inactive buttons */
-            font-size: 14px;
-            color: #666; /* Inactive button text color */
-            text-align: center;
-            font-family: 'Outfit', sans-serif; /* Outfit font for buttons */
-            transition: all 0.3s ease;
-        }
-        .btn-group button.active {
-            background-color: #eacb5f; /* Yellow color for active button */
-            color: black; /* Black text for active button */
-        }
-
-        /* Icon styling for buttons */
-        .btn-group button i {
-            margin-right: 8px;
-        }
-
-        /* Yellow checkbox when checked */
-        input[type="checkbox"]:checked {
-            background-color: #eacb5f;
-            border-color: #eacb5f;
-            accent-color: #eacb5f;  /* Set checkbox checked color */
-        }
-
-        /* Forgot password text yellow */
-        .terms a {
-            font-size: 13px;
-            color: #eacb5f; /* Yellow color for link */
-            text-decoration: none;
-        }
-
-        .form-wrapper {
-            position: relative;
-        }
-
-        form {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-        }
-
-        form.active {
-            display: flex;
-        }
-
-        label {
-            margin-top: 15px;
-            font-weight: normal;
-            font-size: 13px;
-        }
-
-        /* Align First Name and Last Name fields side by side */
-        .name-row {
-            display: flex;
-            gap: 15px;
-        }
-        .name-row input {
-            flex: 1;
-        }
-
-        input[type="email"],
-        input[type="password"],
-        input[type="text"],
-        input[type="tel"],
-        select {
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 14px;
-            width: 100%;
-            font-family: 'Outfit', sans-serif;
-        }
-
-        .password-container {
-            position: relative;
-            width: 100%;
-        }
-
-        .password-container input {
-            width: 100%;
-            padding-right: 40px; /* Space for the eye icon */
-        }
-
-        .password-container i {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #888;
-        }
-
-        .terms {
-            margin-top: 20px;
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .terms label {
-            display: flex;
-            align-items: center;
-            margin: 0;
-        }
-
-        .terms input[type="checkbox"] {
-            margin-right: 8px;
-            width: auto;
-        }
-
-        button[type="submit"] {
-            margin-top: 30px; /* Added space */
-            padding: 12px;
-            background-color: #eacb5f; /* Yellow color */
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: normal;
-            font-size: 14px;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        button[type="submit"] i {
-            margin-right: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/login.css">
 </head>
 <body>
 
@@ -281,7 +106,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
                 <label><input type="checkbox" name="remember"> Remember me</label>
                 <a href="#">Forgot password?</a>
             </div>
-
+            <?php if (isset($login_error)) { echo "<p style='color: red;'>$login_error</p>"; } ?>
             <button type="submit"><i class="fa fa-sign-in"></i>Sign In</button>
         </form>
 
