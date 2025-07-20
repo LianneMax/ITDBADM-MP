@@ -13,7 +13,8 @@
 <!-- Header Section -->
 <header>
     <div class="logo">
-        <img src="assets/logo.png" alt="TechPeripherals Logo">
+        <a href="Index.php">
+        <img src="assets/logo.png" alt="TechPeripherals Logo"> </a>
     </div>
 
     <div class="search-bar">
@@ -96,6 +97,6 @@
         document.getElementById('side-cart').classList.remove('open');
     });
     </script>
-    
+
 </body>
 </html>
