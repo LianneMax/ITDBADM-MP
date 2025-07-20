@@ -6,11 +6,12 @@ body {
 }
 
 .container {
-  max-width: 960px;
-  margin: auto;
+  max-width: 50%;
   background: white;
   padding: 20px;
   border-radius: 12px;
+  margin: auto;
+  margin-top: 100px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
