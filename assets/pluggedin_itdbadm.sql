@@ -149,9 +149,9 @@ CREATE TABLE `payments` (
   `currency_code` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `totalamt_php` float NOT NULL,
-  `payment_status` varchar(45) NOT NULL,
-  `payment_method` varchar(45) DEFAULT NULL,
-  `payment_date` varchar(45) DEFAULT NULL
+  `payment_status` ENUM('paid', 'unpaid') NOT NULL,
+  `payment_method` ENUM('card', 'ewallet', 'cash') NOT NULL,
+  `payment_date` DATETIME DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
