@@ -134,6 +134,68 @@
             cursor: pointer;
         }
 
+        /* Cart styles */
+        .side-cart {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 360px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        transition: right 0.4s ease-in-out;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        }
+
+        .side-cart.open {
+        right: 0;
+        }
+
+        .side-cart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+        font-weight: bold;
+        }
+
+        #close-cart {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        }
+
+        .side-cart-content {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        }
+
+        .side-cart-footer {
+        padding: 20px;
+        border-top: 1px solid #eee;
+        }
+
+        .checkout-btn {
+        width: 100%;
+        padding: 12px;
+        background-color: #eacb5f;
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        }
+
+        .empty-cart-msg {
+        text-align: center;
+        color: #888;
+        }
+
+        /* Product category styles */
         .category-btn {
             padding: 10px 20px;
             border: 1px solid #ddd;
@@ -186,7 +248,9 @@
 
             <!-- Cart Icon (with added margin) -->
             <div class="icon">
-                <link href = "Favorites.php"> <i class="fas fa-shopping-cart"></i> 
+                <button id="cart-toggle" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i> 
+                </button>
             </div>
 
             <!-- Profile Icon -->
@@ -195,6 +259,20 @@
             </div>
         </div>
     </header>
+
+    <div id="side-cart" class="side-cart">
+    <div class="side-cart-header">
+        <h3>Your Cart</h3>
+        <button id="close-cart">&times;</button>
+    </div>
+    <div id="cart-items" class="side-cart-content">
+        <!-- JS will populate items here -->
+        <p class="empty-cart-msg">Your cart is empty.</p>
+    </div>
+    <div class="side-cart-footer">
+        <button class="checkout-btn">Checkout</button>
+    </div>
+    </div>
 
     <!-- Hero Section -->
     <section style="text-align: center; padding: 60px 20px; background: linear-gradient(to right, #fefcea, #f1f2f6);">
@@ -310,6 +388,38 @@
                 // TODO: Add filtered fetch logic here
             });
         });
+    });
+    </script>
+
+    <!-- Cart fetcher -->
+    <script>
+    document.getElementById('cart-toggle').addEventListener('click', function () {
+        document.getElementById('side-cart').classList.add('open');
+
+        // Optional: Load cart items from server
+        fetch('get_cart.php')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            if (data.length === 0) {
+            container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
+            } else {
+            data.forEach(item => {
+                container.innerHTML += `
+                <div class="cart-item">
+                    <p><strong>${item.name}</strong></p>
+                    <p>Qty: ${item.quantity}</p>
+                    <p>₱${item.price}</p>
+                </div>
+                `;
+            });
+            }
+        });
+    });
+
+    document.getElementById('close-cart').addEventListener('click', function () {
+        document.getElementById('side-cart').classList.remove('open');
     });
     </script>
 
