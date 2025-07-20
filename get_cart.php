@@ -4,9 +4,6 @@ include('includes/db.php');
 
 header('Content-Type: application/json');
 
-// For demo purposes, using a fixed user_id. In production, use $_SESSION['user_id']
-//$userId=$_SESSION['user_id']; // Replace with $_SESSION['user_id'] when implementing authentication
-
 $user_id = $_SESSION['user_id'] ?? null;
 
 if (!$user_id) {
