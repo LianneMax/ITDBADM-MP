@@ -1,3 +1,5 @@
+<?php include('includes/header.php'); ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,194 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        /* Reset default styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        /* Body and general styling */
-        body {
-            font-family: 'Outfit', sans-serif;  /* Apply Outfit font */
-            background-color: #f4f4f4;
-            color: #333;
-            padding: 0;
-        }
-
-        /* Navbar Styling */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background-color: #fff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        /* Logo Section */
-        .logo {
-            display: flex;
-            align-items: center;
-        }
-
-        .logo img {
-            width: 120px;
-            height: auto;
-        }
-
-        /* Search Bar Section */
-        .search-bar {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 2px 15px;
-            margin: 0 20px;
-            margin-left: 100px;
-            width: 380px;
-            background-color: #f9f9f9;
-        }
-
-        .search-bar input {
-            border: none;
-            width: 100%;
-            padding: 8px;
-            font-size: 14px;
-            background-color: transparent;
-            outline: none;
-            border-radius: 1px;
-        }
-
-        .search-bar i {
-            font-size: 18px;
-            color: #aaa;
-        }
-
-        /* Icons Section */
-        .icons {
-            display: flex;
-            align-items: center;
-        }
-
-        .icon {
-            margin-left: 20px;
-            cursor: pointer;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #eacb5f;
-            color: white;
-            font-size: 12px;
-            border-radius: 50%;
-            padding: 2px 6px;
-        }
-
-        footer {
-            text-align: center;
-            padding: 20px;
-            background-color: #f1f1f1;
-            font-size: 14px;
-        }
-
-        /* Dropdown menu styling */
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: white;
-            min-width: 160px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .dropdown-content .dropdown-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            color: #333;
-        }
-
-        .dropdown-content .dropdown-item:hover {
-            background-color: #f1f1f1;
-        }
-
-        .dropdown .active {
-            background-color: #eacb5f;
-            color: white;
-        }
-
-        .currency {
-            padding: 8px 16px;
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            cursor: pointer;
-        }
-
-        /* Cart styles */
-        .side-cart {
-        position: fixed;
-        top: 0;
-        right: -100%;
-        width: 360px;
-        height: 100%;
-        background-color: #fff;
-        box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
-        transition: right 0.4s ease-in-out;
-        z-index: 999;
-        display: flex;
-        flex-direction: column;
-        }
-
-        .side-cart.open {
-        right: 0;
-        }
-
-        .side-cart-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px;
-        border-bottom: 1px solid #eee;
-        font-weight: bold;
-        }
-
-        #close-cart {
-        background: none;
-        border: none;
-        font-size: 24px;
-        cursor: pointer;
-        }
-
-        .side-cart-content {
-        flex: 1;
-        padding: 20px;
-        overflow-y: auto;
-        }
-
-        .side-cart-footer {
-        padding: 20px;
-        border-top: 1px solid #eee;
-        }
-
-        .checkout-btn {
-        width: 100%;
-        padding: 12px;
-        background-color: #eacb5f;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        }
-
-        .empty-cart-msg {
-        text-align: center;
-        color: #888;
-        }
-
         /* Product category styles */
         .category-btn {
             padding: 10px 20px;
@@ -215,69 +29,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Header Section -->
-    <header>
-        <!-- Logo Section -->
-        <div class="logo">
-            <img src="assets/logo.png" alt="TechPeripherals Logo">
-        </div>
-
-        <!-- Search Bar Section -->
-        <div class="search-bar">
-            <input type="text" placeholder="Search products...">
-            <i class="fas fa-search"></i>
-        </div>
-
-        <!-- Icons Section -->
-        <div class="icons">
-            <!-- Currency Dropdown -->
-            <div class="icon dropdown">
-                <button class="currency" id="currencyDropdownButton">₱ PHP <i class="fas fa-caret-down"></i></button>
-                <div class="dropdown-content" id="currencyDropdownContent">
-                    <div class="dropdown-item active">₱ PHP</div>
-                    <div class="dropdown-item">$ USD</div>
-                    <div class="dropdown-item">₩ KRW</div>
-                </div>
-            </div>
-
-            <!-- Favorite Icon -->
-            <div class="icon">
-                <a href = "Favorites.php"> <button>
-                <i class="fas fa-heart"></i>
-                </button> </a>
-            </div>
-
-            <!-- Cart Icon (with added margin) -->
-            <div class="icon">
-                <button id="cart-toggle" class="cart-icon">
-                    <i class="fas fa-shopping-cart"></i> 
-                </button>
-            </div>
-
-            <!-- Profile Icon -->
-            <div class="icon">
-                <a href = "User.php"> <button>
-                    <i class="fas fa-user"></i>
-                </button> </a>
-            </div>
-        </div>
-    </header>
-
-    <div id="side-cart" class="side-cart">
-    <div class="side-cart-header">
-        <h3>Your Cart</h3>
-        <button id="close-cart">&times;</button>
-    </div>
-    <div id="cart-items" class="side-cart-content">
-        <!-- JS will populate items here -->
-        <p class="empty-cart-msg">Your cart is empty.</p>
-    </div>
-    <div class="side-cart-footer">
-        <button class="checkout-btn">Checkout</button>
-    </div>
-    </div>
-
     <!-- Hero Section -->
     <section style="text-align: center; padding: 60px 20px; background: linear-gradient(to right, #fefcea, #f1f2f6);">
         <h1 style="font-size: 42px; font-weight: 700; background: linear-gradient(to right, #7c5ca8, #eacb5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
@@ -313,11 +64,6 @@
         <!-- Product cards will be dynamically injected here -->
         </div>
     </section>
-
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2025 TechPeripherals. All rights reserved.</p>
-    </footer>
 
     <!-- JavaScript for Dropdown -->
     <script>
@@ -395,37 +141,7 @@
     });
     </script>
 
-    <!-- Cart fetcher -->
-    <script>
-    document.getElementById('cart-toggle').addEventListener('click', function () {
-        document.getElementById('side-cart').classList.add('open');
-
-        // Optional: Load cart items from server
-        fetch('get_cart.php')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('cart-items');
-            container.innerHTML = '';
-            if (data.length === 0) {
-            container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
-            } else {
-            data.forEach(item => {
-                container.innerHTML += `
-                <div class="cart-item">
-                    <p><strong>${item.name}</strong></p>
-                    <p>Qty: ${item.quantity}</p>
-                    <p>₱${item.price}</p>
-                </div>
-                `;
-            });
-            }
-        });
-    });
-
-    document.getElementById('close-cart').addEventListener('click', function () {
-        document.getElementById('side-cart').classList.remove('open');
-    });
-    </script>
-
 </body>
 </html>
+
+<?php include('includes/footer.php'); ?>
