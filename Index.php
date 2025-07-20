@@ -133,6 +133,23 @@
             border-radius: 10px;
             cursor: pointer;
         }
+
+        .category-btn {
+            padding: 10px 20px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background-color: #eacb5f;
+            color: white;
+            border-color: #eacb5f;
+        }
     </style>
 </head>
 <body>
@@ -248,6 +265,51 @@
                 }
             }
         });
+    </script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        fetchProducts();
+
+        function fetchProducts() {
+            fetch("http://localhost:3001/api/products") // Adjust URL to match your backend
+                .then(response => response.json())
+                .then(data => {
+                    displayProducts(data);
+                })
+                .catch(error => console.error("Error fetching products:", error));
+        }
+
+        function displayProducts(products) {
+            const container = document.getElementById("productsContainer");
+            container.innerHTML = "";
+
+            products.forEach(product => {
+                const card = document.createElement("div");
+                card.style.background = "#fff";
+                card.style.borderRadius = "10px";
+                card.style.padding = "20px";
+                card.style.boxShadow = "0 2px 10px rgba(0,0,0,0.05)";
+                card.innerHTML = `
+                    <div style="height: 150px; background-color: #f0f0f0; border-radius: 8px; margin-bottom: 10px;"></div>
+                    <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 5px;">${product.name}</h3>
+                    <p style="font-size: 14px; color: #999;">₱${product.price}</p>
+                    <button style="margin-top: 10px; padding: 10px 16px; background-color: #7f4af1; color: white; border: none; border-radius: 6px; cursor: pointer;">Add to Cart</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Category filter logic can be implemented here
+        const categoryButtons = document.querySelectorAll(".category-btn");
+        categoryButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                categoryButtons.forEach(btn => btn.classList.remove("active"));
+                button.classList.add("active");
+                // TODO: Add filtered fetch logic here
+            });
+        });
+    });
     </script>
 
 </body>
