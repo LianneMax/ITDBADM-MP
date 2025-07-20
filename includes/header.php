@@ -35,19 +35,19 @@
 
         <!-- Favorite -->
         <div class="icon">
-            <a href="Favorites.php"><button><i class="fas fa-heart"></i></button></a>
+            <a href="Favorites.php"><i class="fas fa-heart"></i></a>
         </div>
 
         <!-- Cart -->
         <div class="icon">
-            <button id="cart-toggle" class="cart-icon">
-                <i class="fas fa-shopping-cart"></i> 
-            </button>
+            <a href="#" id="cart-toggle" class="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
         </div>
 
         <!-- Profile -->
         <div class="icon">
-            <a href="User.php"><button><i class="fas fa-user"></i></button></a>
+            <a href="User.php"><i class="fas fa-user"></i></a>
         </div>
     </div>
 </header>
