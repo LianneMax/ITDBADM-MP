@@ -39,32 +39,64 @@ if ($category_result->num_rows > 0) {
     <link rel="stylesheet" href="styles/product_category.css">
 </head>
 <body>
-    <!-- Hero Section -->
-    <section style="text-align: center; padding: 60px 20px; background: linear-gradient(to right, #fefcea, #f1f2f6);">
-        <h1 style="font-size: 42px; font-weight: 700; background: linear-gradient(to right, #7c5ca8, #eacb5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-        Premium Tech Peripherals
-        </h1>
-        <p style="margin-top: 10px; font-size: 18px; color: #555;">Discover the latest in audio, input devices, and display technology. Quality gear for professionals and enthusiasts.</p>
 
-        <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px; color: #444; font-weight: 500;">
-            <div><strong><?php echo count($products); ?>+</strong><br>Premium Products</div>
-            <div><strong><?php echo count($categories); ?></strong><br>Categories</div>
-            <div><strong>3</strong><br>Currencies</div>
-        </div>
-    </section>
+<!-- Hero Section -->
+<script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.6.2/dist/dotlottie-wc.js" type="module"></script>
 
-    <!-- Category Filter Buttons -->
-    <section style="padding: 30px 20px;">
-        <h2 style="text-align: center; font-size: 26px; margin-bottom: 20px;">Browse Products</h2>
-        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px;">
-            <button class="category-btn active" data-category="all">All Products</button>
-            <?php foreach ($categories as $category): ?>
-                <button class="category-btn" data-category="<?php echo htmlspecialchars($category['category_code']); ?>">
-                    <?php echo htmlspecialchars($category['category_name']); ?>
-                </button>
-            <?php endforeach; ?>
-        </div>
-    </section>
+<section style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 20px;
+    text-align: center;
+    background: #ebebeb;
+">
+    <!-- Lottie Animation -->
+    <dotlottie-wc 
+        src="https://lottie.host/58752aa0-d167-4508-b36d-2de886a98f2d/ECDJc9Wf5b.lottie" 
+        style="width: 300px; height: 300px;" 
+        speed="1" 
+        autoplay 
+        loop>
+    </dotlottie-wc>
+
+    <p style="font-size: 18px; color: #555; max-width: 800px;">
+        Discover the latest in audio, input devices, and display technology. Quality gear for professionals and enthusiasts.
+    </p>
+
+    <div style="
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 40px;
+        color: #444;
+        font-weight: 500;
+        flex-wrap: wrap;
+    ">
+        <div><strong><?php echo count($products); ?>+</strong><br>Premium Products</div>
+        <div><strong><?php echo count($categories); ?></strong><br>Categories</div>
+        <div><strong>3</strong><br>Currencies</div>
+    </div>
+</section>
+
+
+<!-- Category Filter Buttons -->
+<section style="padding: 30px 60px;">
+    <h2 style="font-size: 26px; margin-bottom: 20px;">Browse Products</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 10px; margin-bottom: 30px;">
+        <button class="category-btn active" data-category="all">
+            <i class="fas fa-box"></i> All Products
+        </button>
+
+        <?php foreach ($categories as $category): ?>
+            <button class="category-btn" data-category="<?php echo htmlspecialchars($category['category_code']); ?>">
+                <i class="<?php echo getCategoryIcon($category['category_name']); ?>"></i>
+                <?php echo htmlspecialchars($category['category_name']); ?>
+            </button>
+        <?php endforeach; ?>
+    </div>
+</section>
 
     <!-- Product Cards Container -->
     <section style="padding: 0 40px 60px;">
@@ -248,3 +280,20 @@ if ($category_result->num_rows > 0) {
 </html>
 
 <?php include('includes/footer.php'); ?>
+
+<?php
+// Function to get the appropriate Font Awesome icon class for each category
+function getCategoryIcon($categoryName) {
+    // Here, you can add more categories and their respective icons
+    $icons = [
+        'Headphones' => 'fas fa-headphones',
+        'Keyboards' => 'fas fa-keyboard',    
+        'Mice' => 'fas fa-mouse',             
+        'Monitors' => 'fas fa-desktop',       
+        'Speakers' => 'fas fa-volume-up',     
+        'All Products' => 'fas fa-box'               
+    ];
+
+    return isset($icons[$categoryName]) ? $icons[$categoryName] : 'fa-cogs'; // Default to fa-cogs if no icon found
+}
+?>
