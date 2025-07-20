@@ -73,6 +73,14 @@
             cursor: pointer;
         }
 
+        .fas {
+            color: black;
+        }
+
+        .fas:hover {
+            color: #e8d366;
+        }
+
         .cart-count {
             position: absolute;
             top: -5px;
@@ -122,6 +130,7 @@
             padding: 8px 16px;
             background-color: #f9f9f9;
             border-radius: 10px;
+            border: 1px solid #ddd;
             cursor: pointer;
         }
 
