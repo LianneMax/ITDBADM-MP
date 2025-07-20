@@ -3,13 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 20, 2025 at 08:31 PM
+-- Generation Time: Jul 20, 2025 at 11:24 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
-
-DROP DATABASE IF EXISTS pluggedin_itdbadm;
-CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE pluggedin_itdbadm;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -38,6 +34,14 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL DEFAULT 1,
   `date_added` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
+(4, 1, 5, 1, '2025-07-20 19:54:45'),
+(5, 1, 3, 1, '2025-07-20 20:27:15');
 
 -- --------------------------------------------------------
 
@@ -108,22 +112,6 @@ CREATE TABLE `orders` (
   `currency_code` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
---
--- Dumping data for table `orders`
---
-
-INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
-(2, 1, '2023-10-01', 1500, 'Processing', 1),
-(3, 2, '2023-10-02', 2500, 'Completed', 2),
-(4, 3, '2023-10-03', 1800, 'Shipped', 3),
-(5, 4, '2023-10-04', 2200, 'Processing', 3),
-(6, 5, '2023-10-05', 3000, 'Cancelled', 1),
-(7, 1, '2023-10-01', 1500, 'Processing', 1),
-(8, 2, '2023-10-02', 2500, 'Completed', 2),
-(9, 3, '2023-10-03', 1800, 'Shipped', 3),
-(10, 4, '2023-10-04', 2200, 'Processing', 3),
-(11, 5, '2023-10-05', 3000, 'Cancelled', 1);
-
 -- --------------------------------------------------------
 
 --
@@ -131,6 +119,7 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `orde
 --
 
 CREATE TABLE `order_items` (
+  `order_item_id` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `product_code` int(11) DEFAULT NULL,
   `quantity` int(11) DEFAULT NULL,
@@ -149,9 +138,9 @@ CREATE TABLE `payments` (
   `currency_code` int(11) NOT NULL,
   `order_id` int(11) NOT NULL,
   `totalamt_php` float NOT NULL,
-  `payment_status` ENUM('paid', 'unpaid') NOT NULL,
-  `payment_method` ENUM('card', 'ewallet', 'cash') NOT NULL,
-  `payment_date` DATETIME DEFAULT NULL
+  `payment_status` enum('paid','unpaid') NOT NULL,
+  `payment_method` enum('card','ewallet','cash') NOT NULL,
+  `payment_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 -- --------------------------------------------------------
@@ -184,6 +173,7 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
 (10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000);
+
 -- --------------------------------------------------------
 
 --
@@ -254,16 +244,18 @@ ALTER TABLE `orders`
 -- Indexes for table `order_items`
 --
 ALTER TABLE `order_items`
-  ADD PRIMARY KEY (`order_id`),
-  ADD KEY `product_code_idx` (`product_code`);
+  ADD PRIMARY KEY (`order_item_id`),
+  ADD KEY `product_code_idx` (`product_code`),
+  ADD KEY `idx_order_id` (`order_id`),
+  ADD KEY `idx_product_code` (`product_code`);
 
 --
 -- Indexes for table `payments`
 --
 ALTER TABLE `payments`
   ADD PRIMARY KEY (`payment_id`),
-  ADD KEY `currency_code_idx` (`currency_code`),
-  ADD KEY `order_id_idx` (`order_id`);
+  ADD KEY `fk_payments_currency_code` (`currency_code`),
+  ADD KEY `fk_payments_order_id` (`order_id`);
 
 --
 -- Indexes for table `products`
@@ -287,19 +279,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+
+--
+-- AUTO_INCREMENT for table `order_items`
+--
+ALTER TABLE `order_items`
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
