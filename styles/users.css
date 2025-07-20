@@ -1,0 +1,144 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f9fafb;
+  padding: 40px;
+}
+
+.container {
+  max-width: 960px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.avatar {
+  background: #7d58a6;
+  color: white;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.tabs {
+  display: flex;
+  margin-top: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px;
+  cursor: pointer;
+  border: none;
+  background: #eef1f6;
+}
+
+.tab-btn.active {
+  background: #ffffff;
+  border-bottom: 2px solid #7d58a6;
+  font-weight: bold;
+}
+
+.tab-content {
+  display: none;
+  margin-top: 30px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.info-grid label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.info-grid input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f8f8f8;
+}
+
+.edit-btn {
+  margin-top: 20px;
+  background: #e8d366;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.order-card {
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.status {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: white;
+}
+
+.status.delivered { background: #22c55e; }
+.status.shipped { background: #3b82f6; }
+.status.processing { background: #facc15; }
+.status.ordered { background: #9ca3af; }
+
+.order-tracking {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.step {
+  text-align: center;
+  width: 100px;
+  font-size: 12px;
+  color: #666;
+}
+
+.step.done {
+  font-weight: bold;
+  color: #000;
+}
+
+.details-btn {
+  margin-top: 10px;
+  background: #7d58a6;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}

@@ -257,7 +257,9 @@
 
             <!-- Profile Icon -->
             <div class="icon">
-                <i class="fas fa-user"></i>
+                <a href = "User.php"> <button>
+                    <i class="fas fa-user"></i>
+                </button> </a>
             </div>
         </div>
     </header>
