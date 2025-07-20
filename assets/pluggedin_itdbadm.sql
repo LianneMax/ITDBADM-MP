@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 20, 2025 at 11:24 PM
+-- Generation Time: Jul 20, 2025 at 11:43 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -34,14 +34,6 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL DEFAULT 1,
   `date_added` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `cart`
---
-
-INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
-(4, 1, 5, 1, '2025-07-20 19:54:45'),
-(5, 1, 3, 1, '2025-07-20 20:27:15');
 
 -- --------------------------------------------------------
 
@@ -112,6 +104,13 @@ CREATE TABLE `orders` (
   `currency_code` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
+--
+-- Dumping data for table `orders`
+--
+
+INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
+(20, 1, '2025-07-21', 12000, 'Processing', 3);
+
 -- --------------------------------------------------------
 
 --
@@ -126,6 +125,14 @@ CREATE TABLE `order_items` (
   `srp_php` float DEFAULT NULL,
   `totalprice_php` float DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `order_items`
+--
+
+INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantity`, `srp_php`, `totalprice_php`) VALUES
+(1, 20, 5, 1, 7000, 7000),
+(2, 20, 3, 1, 5000, 5000);
 
 -- --------------------------------------------------------
 
@@ -142,6 +149,13 @@ CREATE TABLE `payments` (
   `payment_method` enum('card','ewallet','cash') NOT NULL,
   `payment_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `currency_code`, `order_id`, `totalamt_php`, `payment_status`, `payment_method`, `payment_date`) VALUES
+(1, 3, 20, 12000, 'unpaid', 'cash', NULL);
 
 -- --------------------------------------------------------
 
@@ -165,9 +179,9 @@ CREATE TABLE `products` (
 INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `description`, `stock_qty`, `srp_php`) VALUES
 (1, 1, 'Sony WH-1000XM4', 'Noise Cancelling Headphones', 50, 12000),
 (2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
-(3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 40, 5000),
+(3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
 (4, 4, 'Razer DeathAdder', 'Gaming Mouse', 60, 3500),
-(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 25, 7000),
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 24, 7000),
 (6, 1, 'Airpods Max', 'Wireless Headphones', 1900, 35000),
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
@@ -285,19 +299,19 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users`
