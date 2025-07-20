@@ -186,7 +186,7 @@
 
             <!-- Cart Icon (with added margin) -->
             <div class="icon">
-                <i class="fas fa-shopping-cart"></i>
+                <link href = "Favorites.php"> <i class="fas fa-shopping-cart"></i> 
             </div>
 
             <!-- Profile Icon -->
@@ -267,6 +267,7 @@
         });
     </script>
 
+    <!-- JS for fetching products -->
     <script>
     document.addEventListener("DOMContentLoaded", () => {
         fetchProducts();
