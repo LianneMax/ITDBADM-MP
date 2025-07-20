@@ -51,6 +51,7 @@ if ($category_result->num_rows > 0) {
     padding: 20px 20px;
     text-align: center;
     background: #ebebeb;
+    z-index: -1;
 ">
     <!-- Lottie Animation -->
     <dotlottie-wc 
