@@ -369,32 +369,6 @@ function addToCart(productCode, quantity, buttonElement) {
     });
 }
 
-// Dropdown functionality
-if (document.getElementById('currencyDropdownButton')) {
-    document.getElementById('currencyDropdownButton').addEventListener('click', function() {
-        const dropdownContent = document.getElementById('currencyDropdownContent');
-        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-    });
-    
-    const items = document.querySelectorAll('.dropdown-item');
-    items.forEach(item => {
-        item.addEventListener('click', function() {
-            items.forEach(innerItem => innerItem.classList.remove('active'));
-            this.classList.add('active');
-            document.getElementById('currencyDropdownButton').innerHTML = this.innerHTML + ' <i class="fas fa-caret-down"></i>';
-            document.getElementById('currencyDropdownContent').style.display = 'none';
-        });
-    });
-    
-    window.addEventListener('click', function(event) {
-        if (!event.target.matches('.dropdown button')) {
-            const dropdowns = document.getElementsByClassName("dropdown-content");
-            for (let i = 0; i < dropdowns.length; i++) {
-                dropdowns[i].style.display = "none";
-            }
-        }
-    });
-}
 </script>
 </body>
 </html>
