@@ -62,7 +62,7 @@
         <p class="empty-cart-msg">Your cart is empty.</p>
     </div>
     <div class="side-cart-footer">
-        <button class="checkout-btn">Checkout</button>
+        <a href = "payment.php"><button class="checkout-btn">Checkout</button></a>
     </div>
 </div>
 
