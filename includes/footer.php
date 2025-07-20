@@ -12,7 +12,7 @@
 
 <!-- Footer Section -->
 <footer>
-    <p>&copy; 2025 TechPeripherals. All rights reserved.</p>
+    <p>&copy; 2025 PluggedIn. All rights reserved.</p>
 </footer>
     
 </body>
