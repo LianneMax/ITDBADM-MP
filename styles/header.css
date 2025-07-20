@@ -1,39 +1,40 @@
-        /* Reset default styles */
+/* Reset default styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         /* Body and general styling */
         body {
             font-family: 'Outfit', sans-serif;  /* Apply Outfit font */
             background-color: #f4f4f4;
             color: #333;
             padding: 0;
+            padding-top: 80px; /* Add padding to prevent content from being hidden behind sticky header */
         }
-
         /* Navbar Styling */
         header {
+            position: fixed; /* Make header fixed */
+            top: 0; /* Position at top of viewport */
+            left: 0; /* Start from left edge */
+            width: 100%; /* Full width */
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 0px 10px;
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            
         }
-
         /* Logo Section */
         .logo {
             display: flex;
             align-items: center;
         }
-
         .logo img {
             width: 120px;
             height: auto;
         }
-
         /* Search Bar Section */
         .search-bar {
             display: flex;
@@ -46,7 +47,6 @@
             width: 380px;
             background-color: #f9f9f9;
         }
-
         .search-bar input {
             border: none;
             width: 100%;
@@ -56,31 +56,25 @@
             outline: none;
             border-radius: 1px;
         }
-
         .search-bar i {
             font-size: 18px;
             color: #aaa;
         }
-
         /* Icons Section */
         .icons {
             display: flex;
             align-items: center;
         }
-
         .icon {
             margin-left: 20px;
             cursor: pointer;
         }
-
         .fas {
             color: black;
         }
-
         .fas:hover {
             color: #e8d366;
         }
-
         .cart-count {
             position: absolute;
             top: -5px;
@@ -91,14 +85,12 @@
             border-radius: 50%;
             padding: 2px 6px;
         }
-
         footer {
             text-align: center;
             padding: 20px;
             background-color: #f1f1f1;
             font-size: 14px;
         }
-
         /* Dropdown menu styling */
         .dropdown-content {
             display: none;
@@ -106,26 +98,22 @@
             background-color: white;
             min-width: 160px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1;
+            z-index: 1001; /* Higher than header to appear above it */
             border-radius: 8px;
             border: 1px solid #ddd;
         }
-
         .dropdown-content .dropdown-item {
             padding: 12px 16px;
             cursor: pointer;
             color: #333;
         }
-
         .dropdown-content .dropdown-item:hover {
             background-color: #f1f1f1;
         }
-
         .dropdown .active {
             background-color: #eacb5f;
             color: white;
         }
-
         .currency {
             padding: 8px 16px;
             background-color: #f9f9f9;
@@ -133,7 +121,6 @@
             border: 1px solid #ddd;
             cursor: pointer;
         }
-
         /* Cart styles */
         .side-cart {
         position: fixed;
@@ -148,11 +135,9 @@
         display: flex;
         flex-direction: column;
         }
-
         .side-cart.open {
         right: 0;
         }
-
         .side-cart-header {
         display: flex;
         justify-content: space-between;
@@ -161,25 +146,21 @@
         border-bottom: 1px solid #eee;
         font-weight: bold;
         }
-
         #close-cart {
         background: none;
         border: none;
         font-size: 24px;
         cursor: pointer;
         }
-
         .side-cart-content {
         flex: 1;
         padding: 20px;
         overflow-y: auto;
         }
-
         .side-cart-footer {
         padding: 20px;
         border-top: 1px solid #eee;
         }
-
         .checkout-btn {
         width: 100%;
         padding: 12px;
@@ -189,7 +170,6 @@
         font-weight: bold;
         cursor: pointer;
         }
-
         .empty-cart-msg {
         text-align: center;
         color: #888;
