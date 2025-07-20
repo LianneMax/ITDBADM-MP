@@ -2,7 +2,7 @@
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "pluggedin_store"; // Change if needed
+$dbname = "pluggedin_itdbadm";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
