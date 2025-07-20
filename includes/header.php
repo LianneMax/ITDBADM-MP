@@ -24,7 +24,7 @@
 
     <div class="icons">
         <!-- Currency Dropdown -->
-        <div class="icon-dropdown">
+        <div class="icon dropdown">
             <button class="currency" id="currencyDropdownButton">₱ PHP <i class="fas fa-caret-down"></i></button>
             <div class="dropdown-content" id="currencyDropdownContent">
                 <div class="dropdown-item active">₱ PHP</div>
