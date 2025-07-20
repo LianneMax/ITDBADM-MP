@@ -32,6 +32,42 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        /* Hero Section */
+        <section style="text-align: center; padding: 60px 20px; background: linear-gradient(to right, #fefcea, #f1f2f6);">
+            <h1 style="font-size: 42px; font-weight: 700; background: linear-gradient(to right, #7c5ca8, #eacb5f); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                Premium Tech Peripherals
+            </h1>
+            <p style="margin-top: 10px; font-size: 18px; color: #555;">Discover the latest in audio, input devices, and display technology. Quality gear for professionals and enthusiasts.</p>
+
+            <div style="display: flex; justify-content: center; gap: 40px; margin-top: 40px; color: #444; font-weight: 500;">
+                <div><strong>21+</strong><br>Premium Products</div>
+                <div><strong>7</strong><br>Categories</div>
+                <div><strong>3</strong><br>Currencies</div>
+            </div>
+        </section>
+
+        <!-- Category Filter Buttons -->
+        <section style="padding: 30px 20px;">
+            <h2 style="text-align: center; font-size: 26px; margin-bottom: 20px;">Browse Products</h2>
+            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px;">
+                <button class="category-btn active">All Products</button>
+                <button class="category-btn">Headphones</button>
+                <button class="category-btn">Earphones</button>
+                <button class="category-btn">Keyboards</button>
+                <button class="category-btn">Microphones</button>
+                <button class="category-btn">Monitors</button>
+                <button class="category-btn">Speakers</button>
+                <button class="category-btn">Mice</button>
+            </div>
+        </section>
+
+        <!-- Product Cards Container -->
+        <section style="padding: 0 40px 60px;">
+            <div id="productsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 30px;">
+                <!-- Product cards will be dynamically injected here -->
+            </div>
+        </section>
+
         /* Logo Section */
         .logo {
             display: flex;
