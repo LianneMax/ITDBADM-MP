@@ -243,7 +243,9 @@
 
             <!-- Favorite Icon -->
             <div class="icon">
+                <a href = "Favorites.php"> <button>
                 <i class="fas fa-heart"></i>
+                </button> </a>
             </div>
 
             <!-- Cart Icon (with added margin) -->
