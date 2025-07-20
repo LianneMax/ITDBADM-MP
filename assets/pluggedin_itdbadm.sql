@@ -178,8 +178,12 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 40, 5000),
 (4, 4, 'Razer DeathAdder', 'Gaming Mouse', 60, 3500),
-(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 25, 7000);
-
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 25, 7000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 1900, 35000),
+(7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
+(8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
+(9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
+(10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000);
 -- --------------------------------------------------------
 
 --
