@@ -54,16 +54,12 @@ if ($category_result->num_rows > 0) {
     </section>
 
     <!-- Category Filter Buttons -->
-    <section style="padding: 30px 60px;">
-        <h2 style="font-size: 26px; margin-bottom: 20px; margin-right: 70px;">Browse Products</h2>
-        <div style="display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 10px; margin-bottom: 30px;">
-            <button class="category-btn active" data-category="all">
-                <i class="fas fa-box"></i> All Products
-            </button>
+    <section style="padding: 30px 20px;">
+        <h2 style="text-align: center; font-size: 26px; margin-bottom: 20px;">Browse Products</h2>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px;">
+            <button class="category-btn active" data-category="all">All Products</button>
             <?php foreach ($categories as $category): ?>
                 <button class="category-btn" data-category="<?php echo htmlspecialchars($category['category_code']); ?>">
-                    <!-- Dynamically select icon based on category name -->
-                    <i class="fas <?php echo getCategoryIcon($category['category_name']); ?>"></i> 
                     <?php echo htmlspecialchars($category['category_name']); ?>
                 </button>
             <?php endforeach; ?>
@@ -174,22 +170,47 @@ if ($category_result->num_rows > 0) {
             });
 
             // Add to cart functionality (you can expand this)
+            // Replace the existing add to cart functionality in your index.php with this:
+
+            // Add to cart functionality
             const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled])");
             addToCartButtons.forEach(button => {
                 button.addEventListener("click", () => {
                     const productCode = button.getAttribute("data-product-code");
-                    // Add your cart functionality here
-                    alert(`Added product ${productCode} to cart!`);
                     
-                    // Optional: Change button text temporarily
-                    const originalText = button.textContent;
-                    button.textContent = "Added!";
-                    button.style.backgroundColor = "#27ae60";
+                    // Create form data
+                    const formData = new FormData();
+                    formData.append('product_code', productCode);
+                    formData.append('quantity', 1);
                     
-                    setTimeout(() => {
-                        button.textContent = originalText;
-                        button.style.backgroundColor = "#7f4af1";
-                    }, 1500);
+                    // Send request to add to cart
+                    fetch('get_cart.php?action=add', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Show success feedback
+                            const originalText = button.textContent;
+                            button.textContent = "Added!";
+                            button.style.backgroundColor = "#27ae60";
+                            
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.backgroundColor = "#7f4af1";
+                            }, 1500);
+                        } else {
+                            // Show error message
+                            alert(data.error || 'Failed to add to cart');
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('HTTP error ' + response.status);
+                        }
+                        return response.json();
+                    })
                 });
             });
         });
@@ -227,20 +248,3 @@ if ($category_result->num_rows > 0) {
 </html>
 
 <?php include('includes/footer.php'); ?>
-
-<?php
-// Function to get the appropriate Font Awesome icon class for each category
-function getCategoryIcon($categoryName) {
-    // Here, you can add more categories and their respective icons
-    $icons = [
-        'Headphones' => 'far fa-headphones',  // Outlined headphones
-        'Keyboards' => 'far fa-keyboard',    // Outlined keyboard
-        'Mice' => 'far fa-mouse',             // Outlined mouse
-        'Monitors' => 'far fa-desktop',       // Outlined desktop
-        'Speakers' => 'far fa-volume-up',     // Outlined volume up (far version)
-        'All Products' => 'far fa-box'        // Outlined box       
-    ];
-
-    return isset($icons[$categoryName]) ? $icons[$categoryName] : 'fa-cogs'; // Default to fa-cogs if no icon found
-}
-?>

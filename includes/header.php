@@ -70,32 +70,105 @@
     <script>
     document.getElementById('cart-toggle').addEventListener('click', function () {
         document.getElementById('side-cart').classList.add('open');
-
-        // Optional: Load cart items from server
-        fetch('get_cart.php')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('cart-items');
-            container.innerHTML = '';
-            if (data.length === 0) {
-            container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
-            } else {
-            data.forEach(item => {
-                container.innerHTML += `
-                <div class="cart-item">
-                    <p><strong>${item.name}</strong></p>
-                    <p>Qty: ${item.quantity}</p>
-                    <p>₱${item.price}</p>
-                </div>
-                `;
-            });
-            }
-        });
+        loadCart();
     });
 
     document.getElementById('close-cart').addEventListener('click', function () {
         document.getElementById('side-cart').classList.remove('open');
     });
+
+    function loadCart() {
+        fetch('get_cart.php?action=get')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+            
+            if (data.items.length === 0) {
+                container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
+            } else {
+                data.items.forEach(item => {
+                    container.innerHTML += `
+                    <div class="cart-item" data-cart-id="${item.cart_id}">
+                        <div class="item-info">
+                            <strong>${item.name}</strong>
+                            <p>₱${item.price} each</p>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">-</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})">+</button>
+                        </div>
+                        <div class="item-total">
+                            <p>₱${item.total_price}</p>
+                            <button class="remove-btn" onclick="removeItem(${item.cart_id})">×</button>
+                        </div>
+                    </div>
+                    `;
+                });
+                
+                // Add total at the bottom
+                container.innerHTML += `
+                <div class="cart-total">
+                    <strong>Total: ₱${data.total}</strong>
+                </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error loading cart:', error);
+        });
+    }
+
+    function updateQuantity(cartId, newQuantity) {
+        if (newQuantity < 1) {
+            removeItem(cartId);
+            return;
+        }
+        
+        const formData = new FormData();
+        formData.append('cart_id', cartId);
+        formData.append('quantity', newQuantity);
+        
+        fetch('get_cart.php?action=update', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadCart(); // Reload cart
+            } else {
+                alert(data.error || 'Failed to update quantity');
+            }
+        })
+        .catch(error => {
+            console.error('Error updating quantity:', error);
+        });
+    }
+
+    function removeItem(cartId) {
+        if (!confirm('Remove this item from cart?')) return;
+        
+        const formData = new FormData();
+        formData.append('cart_id', cartId);
+        
+        fetch('get_cart.php?action=delete', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadCart(); // Reload cart
+            } else {
+                alert(data.error || 'Failed to remove item');
+            }
+        })
+        .catch(error => {
+            console.error('Error removing item:', error);
+        });
+    }
     </script>
 
 </body>
