@@ -32,29 +32,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['email'] = $email;
             $_SESSION['logged_in'] = true;
 
-            // Role-based redirection
-            $redirect_page = "";
-            $role_message = "";
-            
-            switch (strtolower($user_role)) {
-                case 'admin':
-                    $redirect_page = 'Admin.php';
-                    $role_message = 'Welcome Admin! Redirecting to admin dashboard...';
-                    break;
-                case 'staff':
-                    $redirect_page = 'staff_main.php';
-                    $role_message = 'Welcome Staff! Redirecting to staff panel...';
-                    break;
-                case 'customer':
-                default:
-                    $redirect_page = 'Index.php';
-                    $role_message = 'Welcome Customer! Redirecting to homepage...';
-                    break;
-            }
-
+            // Redirect to homepage
             echo "<script>
-                alert('$role_message');
-                window.location.href = '$redirect_page';
+                alert('Login successful! Redirecting...');
+                window.location.href = 'Index.php';
             </script>";
             exit;
         } else {
@@ -66,38 +47,91 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $stmt->close();
 }
 
+// Handle registration form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
+    $firstName = trim($_POST['firstName']);
+    $lastName = trim($_POST['lastName']);
+    $email = trim($_POST['regEmail']);
+    $password = $_POST['regPassword'];
+    $confirmPassword = $_POST['confirmPassword'];
+
+    // Validation
+    if (empty($firstName) || empty($lastName) || empty($email) || empty($password) || empty($confirmPassword)) {
+        $register_error = "All fields are required.";
+    } elseif (strlen($password) < 6) {
+        $register_error = "Password must be at least 6 characters long.";
+    } elseif ($password !== $confirmPassword) {
+        $register_error = "Passwords do not match.";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $register_error = "Please enter a valid email address.";
+    } else {
+        // Check if email already exists
+        $stmt = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+
+        if ($stmt->num_rows > 0) {
+            $register_error = "An account with this email already exists.";
+        } else {
+            // Insert new user (defaulting to 'Customer' role)
+            $insert_stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, user_role) VALUES (?, ?, ?, ?, 'Customer')");
+            $insert_stmt->bind_param("ssss", $firstName, $lastName, $email, $password);
+            
+            if ($insert_stmt->execute()) {
+                $register_success = "Account created successfully! You can now sign in with your credentials.";
+                // Clear form data after successful registration
+                $_POST = array();
+            } else {
+                $register_error = "Something went wrong. Please try again.";
+            }
+            $insert_stmt->close();
+        }
+        $stmt->close();
+    }
+}
+
 // Handle forgot password form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
     $email = trim($_POST['email']);
     $old_password = $_POST['oldPassword'];
     $new_password = $_POST['newPassword'];
 
-    // Check if email exists
-    $stmt = $conn->prepare("SELECT user_id, password FROM users WHERE email = ?");
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $stmt->store_result();
+    // Validation
+    if (empty($email) || empty($old_password) || empty($new_password)) {
+        $forgot_password_error = "All fields are required.";
+    } elseif (strlen($new_password) < 6) {
+        $forgot_password_error = "New password must be at least 6 characters long.";
+    } else {
+        // Check if email exists
+        $stmt = $conn->prepare("SELECT user_id, password FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
 
-    if ($stmt->num_rows === 1) {
-        $stmt->bind_result($user_id, $hashed_password);
-        $stmt->fetch();
+        if ($stmt->num_rows === 1) {
+            $stmt->bind_result($user_id, $hashed_password);
+            $stmt->fetch();
 
-        if ($old_password === $hashed_password) {
-            // Update with new password
-            $update_stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
-            $update_stmt->bind_param("ss", $new_password, $email);
-            if ($update_stmt->execute()) {
-                $forgot_password_success = "Password updated successfully. You can now login with your new password.";
+            if ($old_password === $hashed_password) {
+                // Update with new password
+                $update_stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+                $update_stmt->bind_param("ss", $new_password, $email);
+                
+                if ($update_stmt->execute()) {
+                    $forgot_password_success = "Password updated successfully. You can now login with your new password.";
+                } else {
+                    $forgot_password_error = "Something went wrong. Please try again.";
+                }
+                $update_stmt->close();
             } else {
-                $forgot_password_error = "Something went wrong. Please try again.";
+                $forgot_password_error = "Old password is incorrect.";
             }
         } else {
-            $forgot_password_error = "Old password is incorrect.";
+            $forgot_password_error = "No account found with that email.";
         }
-    } else {
-        $forgot_password_error = "No account found with that email.";
+        $stmt->close();
     }
-    $stmt->close();
 }
 
 ?>
@@ -151,18 +185,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
                 <div>
                     <label for="firstName">First Name</label>
                     <input type="text" id="firstName" name="firstName" placeholder="John" 
-                           value="<?php echo isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : ''; ?>" required>
+                           value="<?php echo isset($_POST['firstName']) && empty($register_success) ? htmlspecialchars($_POST['firstName']) : ''; ?>" required>
                 </div>
                 <div>
                     <label for="lastName">Last Name</label>
                     <input type="text" id="lastName" name="lastName" placeholder="Doe" 
-                           value="<?php echo isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : ''; ?>" required>
+                           value="<?php echo isset($_POST['lastName']) && empty($register_success) ? htmlspecialchars($_POST['lastName']) : ''; ?>" required>
                 </div>
             </div>
 
             <label for="regEmail">Email</label>
             <input type="email" id="regEmail" name="regEmail" placeholder="john.doe@example.com" 
-                   value="<?php echo isset($_POST['regEmail']) ? htmlspecialchars($_POST['regEmail']) : ''; ?>" required>
+                   value="<?php echo isset($_POST['regEmail']) && empty($register_success) ? htmlspecialchars($_POST['regEmail']) : ''; ?>" required>
 
             <label for="regPassword">Password <small>(minimum 6 characters)</small></label>
             <div class="password-container">
@@ -192,14 +226,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
 
         <!-- Forgot Password Form -->
         <form id="forgotPasswordForm" method="post" action="" style="display:none;">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+            <label for="forgotEmail">Email</label>
+            <input type="email" id="forgotEmail" name="email" placeholder="Enter your email" required>
 
             <label for="oldPassword">Old Password</label>
             <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password" required>
 
-            <label for="newPassword">New Password</label>
-            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required>
+            <label for="newPassword">New Password <small>(minimum 6 characters)</small></label>
+            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" minlength="6" required>
 
             <?php if (!empty($forgot_password_error)) { echo "<p style='color: red; margin: 10px 0;'>$forgot_password_error</p>"; } ?>
             <?php if (!empty($forgot_password_success)) { echo "<p style='color: green; margin: 10px 0;'>$forgot_password_success</p>"; } ?>
@@ -241,8 +275,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
             button.classList.remove('active');
         });
         
-        const activeButton = document.getElementById(form + 'Btn');
-        activeButton.classList.add('active');
+        if (form !== 'forgotPassword') {
+            const activeButton = document.getElementById(form + 'Btn');
+            if (activeButton) {
+                activeButton.classList.add('active');
+            }
+        }
     }
 
     // Password visibility toggle
@@ -260,6 +298,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
             icon.classList.add('fa-eye');
         }
     }
+
+    // Show registration form if there's a registration success message
+    <?php if (!empty($register_success)) { ?>
+        // Keep registration form visible to show success message
+        toggleForm('register');
+    <?php } elseif (!empty($register_error)) { ?>
+        // Show registration form if there was an error
+        toggleForm('register');
+    <?php } elseif (!empty($forgot_password_error) || !empty($forgot_password_success)) { ?>
+        // Show forgot password form if there was an error or success
+        toggleForm('forgotPassword');
+    <?php } ?>
 </script>
 
 </body>
