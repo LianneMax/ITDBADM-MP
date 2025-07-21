@@ -185,6 +185,9 @@ const productsData = <?php echo json_encode($products); ?>;
 let favoriteStates = {};
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Load favorite states from database
+    loadFavoriteStates();
+    
     // Category filter functionality
     const categoryButtons = document.querySelectorAll(".category-btn");
     const productCards = document.querySelectorAll(".product-card");
@@ -252,6 +255,26 @@ document.addEventListener("DOMContentLoaded", () => {
         event.stopPropagation();
     });
 });
+
+function loadFavoriteStates() {
+    fetch('get_favorites.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Reset favorite states
+                favoriteStates = {};
+                
+                // Set favorite states from database
+                data.favorites.forEach(productCode => {
+                    favoriteStates[productCode] = true;
+                    updateFavoriteButtons(productCode, true);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error loading favorite states:', error);
+        });
+}
 
 function openProductModal(productCode) {
     const product = productsData.find(p => p.product_code === productCode);
@@ -328,14 +351,33 @@ function toggleFavorite(productCode) {
     
     if (!productCode) return;
     
-    // Toggle favorite state
-    favoriteStates[productCode] = !favoriteStates[productCode];
+    // Send request to server
+    const formData = new FormData();
+    formData.append('product_code', productCode);
     
-    // Update both card and modal favorite buttons
-    updateFavoriteButtons(productCode, favoriteStates[productCode]);
-    
-    // Here you can add AJAX call to save favorite status to database
-    console.log('Toggled favorite for product:', productCode, 'State:', favoriteStates[productCode]);
+    fetch('toggle_favorite.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update local state
+            favoriteStates[productCode] = data.is_favorite;
+            
+            // Update UI
+            updateFavoriteButtons(productCode, data.is_favorite);
+            
+            // Show feedback
+            const action = data.action === 'added' ? 'Added to' : 'Removed from';
+            console.log(`${action} favorites: Product ${productCode}`);
+        } else {
+            console.error('Error toggling favorite:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
 }
 
 function updateFavoriteButtons(productCode, isFavorite) {
@@ -358,9 +400,11 @@ function updateFavoriteButton(buttonElement, isFavorite) {
     if (isFavorite) {
         buttonElement.classList.add('active');
         icon.className = 'fas fa-heart';
+        icon.style.color = '#ff4757';
     } else {
         buttonElement.classList.remove('active');
         icon.className = 'far fa-heart';
+        icon.style.color = '';
     }
 }
 
@@ -402,7 +446,6 @@ function addToCart(productCode, quantity, buttonElement) {
         alert('Failed to add to cart');
     });
 }
-
 </script>
 </body>
 </html>

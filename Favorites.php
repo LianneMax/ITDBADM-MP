@@ -1,25 +1,17 @@
-<?php include('includes/header.php'); ?>
-
 <?php
 // DB connection
-$host = "localhost";
-$user = "root";
-$password = "";
-$dbname = "pluggedin_itdbadm";
-
-$conn = new mysqli($host, $user, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include('includes/db.php');
 
 // Dummy user_id for demo (you can use sessions in real use case)
 $user_id = 1;
 
-// Fetch favorited products
-$sql = "SELECT p.product_code, p.product_name, p.srp_php 
+// Fetch favorited products with more details
+$sql = "SELECT p.product_code, p.product_name, p.description, p.srp_php, p.stock_qty, c.category_name 
         FROM isfavorite f
         JOIN products p ON f.product_code = p.product_code
-        WHERE f.user_id = ?";
+        LEFT JOIN categories c ON p.category_code = c.category_code
+        WHERE f.user_id = ?
+        ORDER BY p.product_name";
 
 $stmt = $conn->prepare($sql);
 if (!$stmt) {
@@ -57,10 +49,25 @@ $result = $stmt->get_result();
         <div class="container">
             <?php while($row = $result->fetch_assoc()): ?>
                 <div class="product-card">
-                    <div style="height: 150px; background-color: #f0f0f0; border-radius: 8px;"></div>
+                    <div style="height: 150px; background-color: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #999;">
+                        <i class="fas fa-image" style="font-size: 24px;"></i>
+                    </div>
+                    <?php if (!empty($row['category_name'])): ?>
+                        <div style="font-size: 12px; color: #666; margin-top: 8px;"><?= htmlspecialchars($row['category_name']) ?></div>
+                    <?php endif; ?>
                     <h3><?= htmlspecialchars($row['product_name']) ?></h3>
-                    <p>₱<?= number_format($row['srp_php'], 2) ?></p>
-                    <button style="margin-top: 10px; padding: 10px 16px; background-color: #7f4af1; color: white; border: none; border-radius: 6px; cursor: pointer;">Add to Cart</button>
+                    <p style="font-size: 14px; color: #666; margin: 4px 0;"><?= htmlspecialchars($row['description'] ?? '') ?></p>
+                    <p style="font-size: 18px; font-weight: 600; color: #7f4af1;">₱<?= number_format($row['srp_php'], 2) ?></p>
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button style="flex: 1; padding: 10px 16px; background-color: #7f4af1; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <button onclick="removeFromFavorites('<?= $row['product_code'] ?>')" 
+                                style="padding: 10px 12px; background-color: #ff4757; color: white; border: none; border-radius: 6px; cursor: pointer;" 
+                                title="Remove from favorites">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
                 </div>
             <?php endwhile; ?>
         </div>
@@ -78,6 +85,30 @@ $result = $stmt->get_result();
 $stmt->close();
 $conn->close();
 ?>
+
+<script>
+function removeFromFavorites(productCode) {
+    const formData = new FormData();
+    formData.append('product_code', productCode);
+    
+    fetch('toggle_favorite.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.action === 'removed') {
+            // Reload the page to reflect changes
+            window.location.reload();
+        } else {
+            console.error('Error removing from favorites:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 
 </body>
 </html>
