@@ -93,7 +93,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login/Register - TechPeripherals</title>
+    <title>Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="styles/login.css">
@@ -101,7 +101,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
 <body>
 
 <div class="container">
-    <h1>Welcome to TechPeripherals</h1>
+    <h1>Welcome to PluggedIn</h1>
     <p>Sign in to your account or create a new one</p>
 
     <div class="btn-group">
