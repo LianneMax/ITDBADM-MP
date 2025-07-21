@@ -219,8 +219,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Add to cart functionality
-    const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled])");
+    // Add to cart functionality for product cards only (exclude modal button)
+    const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled]):not(#modalAddToCart)");
     addToCartButtons.forEach(button => {
         button.addEventListener("click", () => {
             const productCode = button.getAttribute("data-product-code");
