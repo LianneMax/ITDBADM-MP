@@ -1,9 +1,16 @@
 <?php
+session_start();
+include ('includes/header.php');
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header('Location: login.php');
+    exit;
+}
+
 // DB connection
 include('includes/db.php');
-
-// Dummy user_id for demo (you can use sessions in real use case)
-$user_id = 1;
+$user_id = $_SESSION['user_id'];
 
 // Fetch favorited products with more details
 $sql = "SELECT p.product_code, p.product_name, p.description, p.srp_php, p.stock_qty, c.category_name 

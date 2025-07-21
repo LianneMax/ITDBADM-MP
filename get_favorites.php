@@ -1,10 +1,17 @@
 <?php
+session_start();
 include('includes/db.php');
 
 header('Content-Type: application/json');
 
-// For demo purposes, using user_id = 1. In production, get from session
-$user_id = 1;
+// Check if user is logged in
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'error' => 'User not logged in']);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
+
 
 try {
     $sql = "SELECT product_code FROM isfavorite WHERE user_id = ?";
