@@ -1,4 +1,5 @@
 <?php
+session_start();
 include('includes/db.php');
 
 header('Content-Type: application/json');
@@ -8,8 +9,12 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// For demo purposes, using user_id = 1. In production, get from session
-$user_id = 1;
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'error' => 'User not logged in']);
+    exit;
+}
+
+$user_id = $_SESSION['user_id'];
 $product_code = $_POST['product_code'] ?? null;
 
 if (!$product_code) {
