@@ -391,45 +391,6 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   </div>
 </div>
 
-<!-- Trigger & Procedure Status Section -->
-<div class="trigger-status">
-  <h3>🔧 Database Triggers & Procedures Status</h3>
-  <div class="status-grid">
-    <div class="status-item">
-      <strong>✅ inventory_adjustment_trigger</strong>
-      <p>Automatically logs stock changes to inventory_log table when products.stock_qty is updated</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ order_status_logging_trigger</strong>
-      <p>Automatically logs order status changes to order_status_log table</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ prevent_negative_inventory</strong>
-      <p>Prevents order_items from creating negative inventory</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ customer_deletion_log_trigger</strong>
-      <p>Logs customer deletions to customer_deletion_log table</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ add_new_product()</strong>
-      <p>Stored procedure for adding products (integrated above)</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ update_product_stock()</strong>
-      <p>Stored procedure for updating stock (integrated above)</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ update_order_status()</strong>
-      <p>Stored procedure for updating order status (integrated above)</p>
-    </div>
-    <div class="status-item">
-      <strong>✅ delete_customer_account()</strong>
-      <p>Stored procedure for complete customer deletion (integrated above)</p>
-    </div>
-  </div>
-</div>
-
 <script>
 function showTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
