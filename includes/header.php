@@ -1,3 +1,9 @@
+<?php
+// Start session to check login status
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,19 +15,16 @@
     <link rel="stylesheet" href="styles/header.css">
 </head>
 <body>
-
 <!-- Header Section -->
 <header>
     <div class="logo">
         <a href="Index.php">
         <img src="assets/logo.png" alt="TechPeripherals Logo"> </a>
     </div>
-
     <div class="search-bar">
         <input type="text" placeholder="Search products...">
         <i class="fas fa-search"></i>
     </div>
-
     <div class="icons">
         <!-- Currency Dropdown -->
         <div class="icon dropdown">
@@ -32,26 +35,26 @@
                 <div class="dropdown-item">₩ KRW</div>
             </div>
         </div>
-
         <!-- Favorite -->
         <div class="icon">
             <a href="Favorites.php"><i class="fas fa-heart"></i></a>
         </div>
-
         <!-- Cart -->
         <div class="icon">
             <a href="#" id="cart-toggle" class="cart-icon">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
-
         <!-- Profile -->
         <div class="icon">
-            <a href="User.php"><i class="fas fa-user"></i></a>
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <a href="User.php"><i class="fas fa-user"></i></a>
+            <?php else: ?>
+                <a href="Login.php"><i class="fas fa-user"></i></a>
+            <?php endif; ?>
         </div>
     </div>
 </header>
-
 <!-- Side Cart -->
 <div id="side-cart" class="side-cart">
     <div class="side-cart-header">
@@ -65,18 +68,15 @@
         <a href = "payment.php"><button class="checkout-btn">Checkout</button></a>
     </div>
 </div>
-
     <!-- Cart fetcher -->
     <script>
     document.getElementById('cart-toggle').addEventListener('click', function () {
         document.getElementById('side-cart').classList.add('open');
         loadCart();
     });
-
     document.getElementById('close-cart').addEventListener('click', function () {
         document.getElementById('side-cart').classList.remove('open');
     });
-
     function loadCart() {
         fetch('get_cart.php?action=get')
         .then(response => response.json())
@@ -119,7 +119,6 @@
             console.error('Error loading cart:', error);
         });
     }
-
     function updateQuantity(cartId, newQuantity) {
         if (newQuantity < 1) {
             removeItem(cartId);
@@ -146,7 +145,6 @@
             console.error('Error updating quantity:', error);
         });
     }
-
     function removeItem(cartId) {
         if (!confirm('Remove this item from cart?')) return;
         
@@ -170,20 +168,17 @@
         });
     }
     </script>
-
     <!-- Currency Dropdown JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const currencyButton = document.getElementById('currencyDropdownButton');
         const currencyDropdown = document.getElementById('currencyDropdownContent');
         const dropdownItems = document.querySelectorAll('.dropdown-item');
-
         // Toggle dropdown
         currencyButton.addEventListener('click', function(event) {
             event.stopPropagation(); // prevent window click from firing
             currencyDropdown.style.display = currencyDropdown.style.display === 'block' ? 'none' : 'block';
         });
-
         // Selecting currency
         dropdownItems.forEach(item => {
             item.addEventListener('click', function(event) {
@@ -194,7 +189,6 @@
                 currencyDropdown.style.display = 'none';
             });
         });
-
         // Close dropdown if clicking outside
         window.addEventListener('click', function(event) {
             // Close only if click is outside dropdown
@@ -204,6 +198,5 @@
         });
     });
 </script>
-
 </body>
 </html>

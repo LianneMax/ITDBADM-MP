@@ -1,17 +1,24 @@
 <?php
-session_start();
-include('includes/header.php'); 
-require_once 'includes/db.php'; // Connection to DB
+session_start(); // Start the session
 
-// Make sure user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: Login.php");
+// Handle logout (before any output, including HTML)
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php"); // Redirect to home page
     exit();
 }
 
+// Make sure user is logged in (before any output)
+if (!isset($_SESSION['user_id'])) {
+    header("Location: Login.php"); // Redirect to login page if not logged in
+    exit();
+}
+
+require_once 'includes/db.php'; // Connection to DB
+
 $userId = $_SESSION['user_id'];
 
-// Fetch user profile - Updated to match your schema
+// Fetch user profile
 $stmt = $conn->prepare("SELECT user_id, user_role, first_name, last_name, email, password FROM users WHERE user_id = ?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
@@ -45,10 +52,8 @@ function getUserInitials($firstName, $lastName) {
     $lastInitial = !empty($lastName) ? strtoupper($lastName[0]) : '';
     return $firstInitial . $lastInitial;
 }
-
 $userInitials = getUserInitials($userResult['first_name'], $userResult['last_name']);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,26 +102,62 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       color: #2c3e50;
       margin-top: 8px;
     }
+    
+    /* Logout button styles */
+    .logout-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      margin-left: auto;
+    }
+    
+    .logout-btn:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+    
+    .user-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    
+    .user-header-left {
+      display: flex;
+      align-items: center;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="user-header">
-      <div class="avatar"><?= $userInitials ?></div>
-      <div class="user-info">
-        <h2>
-          <?= htmlspecialchars($fullName) ?>
-          <span class="user-role-badge"><?= htmlspecialchars($userResult['user_role']) ?></span>
-        </h2>
-        <p><?= htmlspecialchars($userResult['email']) ?></p>
+      <div class="user-header-left">
+        <div class="avatar"><?= $userInitials ?></div>
+        <div class="user-info">
+          <h2>
+            <?= htmlspecialchars($fullName) ?>
+            <span class="user-role-badge"><?= htmlspecialchars($userResult['user_role']) ?></span>
+          </h2>
+          <p><?= htmlspecialchars($userResult['email']) ?></p>
+        </div>
       </div>
+      <a href="?logout=1" class="logout-btn" onclick="return confirmLogout()">🚪 Logout</a>
     </div>
-
+    
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('profile')">Profile</button>
       <button class="tab-btn" onclick="showTab('orders')">Order History</button>
     </div>
-
+    
     <!-- Profile Section -->
     <div id="profile" class="tab-content active">
       <h3>📑 Profile Information</h3>
@@ -144,7 +185,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       </div>
       <button class="edit-btn">✏️ Edit Profile</button>
     </div>
-
+    
     <!-- Order History Section -->
     <div id="orders" class="tab-content">
       <h3>📦 Order History</h3>
@@ -195,7 +236,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       <?php endif; ?>
     </div>
   </div>
-
+  
   <script>
     function showTab(tab) {
       document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
@@ -213,6 +254,10 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       // window.location.href = 'order_details.php?order_id=' + orderId;
       
       // Or open a modal with order details via AJAX
+    }
+    
+    function confirmLogout() {
+      return confirm('Are you sure you want to logout?');
     }
   </script>
 </body>
