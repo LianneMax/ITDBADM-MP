@@ -56,27 +56,38 @@ if (session_status() == PHP_SESSION_NONE) {
     </div>
 </header>
 <!-- Side Cart -->
+
 <div id="side-cart" class="side-cart">
     <div class="side-cart-header">
-        <h3>Your Cart</h3>
+        <h3>Shopping Cart</h3>
         <button id="close-cart">&times;</button>
     </div>
     <div id="cart-items" class="side-cart-content">
         <p class="empty-cart-msg">Your cart is empty.</p>
     </div>
     <div class="side-cart-footer">
-        <a href = "payment.php"><button class="checkout-btn">Checkout</button></a>
+        <a href="payment.php">
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </a>
     </div>
 </div>
+
+    <!-- Cart Overlay for mobile -->
+    <div id="cart-overlay" class="cart-overlay"></div>
+
     <!-- Cart fetcher -->
-    <script>
+    <!-- Cart fetcher -->
+<script>
+    // Enhanced Cart JavaScript
     document.getElementById('cart-toggle').addEventListener('click', function () {
         document.getElementById('side-cart').classList.add('open');
         loadCart();
     });
+
     document.getElementById('close-cart').addEventListener('click', function () {
         document.getElementById('side-cart').classList.remove('open');
     });
+
     function loadCart() {
         fetch('get_cart.php?action=get')
         .then(response => response.json())
@@ -87,30 +98,48 @@ if (session_status() == PHP_SESSION_NONE) {
             if (data.items.length === 0) {
                 container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
             } else {
+                // Add cart items
                 data.items.forEach(item => {
                     container.innerHTML += `
                     <div class="cart-item" data-cart-id="${item.cart_id}">
+                        <div class="item-image">
+                            <i class="fas fa-headphones"></i>
+                        </div>
                         <div class="item-info">
                             <strong>${item.name}</strong>
-                            <p>₱${item.price} each</p>
+                            <div class="item-brand">TechPeripherals</div>
+                            <p class="item-price">₱${item.price}</p>
+                            <div class="quantity-controls">
+                                <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">−</button>
+                                <span class="quantity">${item.quantity}</span>
+                                <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})">+</button>
+                            </div>
                         </div>
-                        <div class="quantity-controls">
-                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">-</button>
-                            <span class="quantity">${item.quantity}</span>
-                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})">+</button>
-                        </div>
-                        <div class="item-total">
-                            <p>₱${item.total_price}</p>
-                            <button class="remove-btn" onclick="removeItem(${item.cart_id})">×</button>
-                        </div>
+                        <button class="remove-btn" onclick="removeItem(${item.cart_id})">🗑</button>
                     </div>
                     `;
                 });
                 
-                // Add total at the bottom
+                // Calculate subtotal and tax
+                const subtotal = parseFloat(data.total.replace(/,/g, ''));
+                const tax = subtotal * 0.12; // 12% tax
+                const total = subtotal + tax;
+                
+                // Add cart summary
                 container.innerHTML += `
-                <div class="cart-total">
-                    <strong>Total: ₱${data.total}</strong>
+                <div class="cart-summary">
+                    <div class="summary-row">
+                        <span class="summary-label">Subtotal</span>
+                        <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Tax (12%)</span>
+                        <span class="summary-value">₱${tax.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Total</span>
+                        <span class="summary-value">₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    </div>
                 </div>
                 `;
             }
@@ -119,12 +148,13 @@ if (session_status() == PHP_SESSION_NONE) {
             console.error('Error loading cart:', error);
         });
     }
+
     function updateQuantity(cartId, newQuantity) {
         if (newQuantity < 1) {
             removeItem(cartId);
             return;
         }
-        
+    
         const formData = new FormData();
         formData.append('cart_id', cartId);
         formData.append('quantity', newQuantity);
@@ -145,6 +175,7 @@ if (session_status() == PHP_SESSION_NONE) {
             console.error('Error updating quantity:', error);
         });
     }
+
     function removeItem(cartId) {
         if (!confirm('Remove this item from cart?')) return;
         
@@ -167,36 +198,6 @@ if (session_status() == PHP_SESSION_NONE) {
             console.error('Error removing item:', error);
         });
     }
-    </script>
-    <!-- Currency Dropdown JavaScript -->
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const currencyButton = document.getElementById('currencyDropdownButton');
-        const currencyDropdown = document.getElementById('currencyDropdownContent');
-        const dropdownItems = document.querySelectorAll('.dropdown-item');
-        // Toggle dropdown
-        currencyButton.addEventListener('click', function(event) {
-            event.stopPropagation(); // prevent window click from firing
-            currencyDropdown.style.display = currencyDropdown.style.display === 'block' ? 'none' : 'block';
-        });
-        // Selecting currency
-        dropdownItems.forEach(item => {
-            item.addEventListener('click', function(event) {
-                event.stopPropagation();
-                dropdownItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                currencyButton.innerHTML = this.innerHTML + ' <i class="fas fa-caret-down"></i>';
-                currencyDropdown.style.display = 'none';
-            });
-        });
-        // Close dropdown if clicking outside
-        window.addEventListener('click', function(event) {
-            // Close only if click is outside dropdown
-            if (!currencyButton.contains(event.target) && !currencyDropdown.contains(event.target)) {
-                currencyDropdown.style.display = 'none';
-            }
-        });
-    });
 </script>
 </body>
 </html>
