@@ -4,9 +4,12 @@ include "includes/db.php";
 
 // Initialize variables
 $login_error = "";
+$forgot_password_error = "";
+$forgot_password_success = "";
 $register_error = "";
 $register_success = "";
 
+// Handle login form submission
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
@@ -28,8 +31,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['last_name'] = $last_name;
             $_SESSION['email'] = $email;
             $_SESSION['logged_in'] = true;
-            
-            // Use JavaScript redirect instead of header redirect
+
+            // Redirect to homepage
             echo "<script>
                 alert('Login successful! Redirecting...');
                 window.location.href = 'Index.php';
@@ -44,48 +47,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $stmt->close();
 }
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
-    $first_name = trim($_POST['firstName']);
-    $last_name = trim($_POST['lastName']);
-    $email = trim($_POST['regEmail']);
-    $password = $_POST['regPassword'];
-    $user_role = 'Customer'; // Automatically set to Customer
+// Handle forgot password form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
+    $email = trim($_POST['email']);
+    $old_password = $_POST['oldPassword'];
+    $new_password = $_POST['newPassword'];
 
-    // Validate input
-    if (empty($first_name) || empty($last_name) || empty($email) || empty($password)) {
-        $register_error = "All fields are required.";
-    } elseif (strlen($password) < 6) {
-        $register_error = "Password must be at least 6 characters long.";
-    } else {
-        // Check if email already exists
-        $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
-        $check->bind_param("s", $email);
-        $check->execute();
-        $check->store_result();
+    // Check if email exists
+    $stmt = $conn->prepare("SELECT user_id, password FROM users WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $stmt->store_result();
 
-        if ($check->num_rows > 0) {
-            $register_error = "Email is already registered.";
-        } else {
-            // Insert new user with Customer role
-            $insert = $conn->prepare("INSERT INTO users (user_role, first_name, last_name, email, password) VALUES (?, ?, ?, ?, ?)");
-            $insert->bind_param("sssss", $user_role, $first_name, $last_name, $email, $password);
-            
-            if ($insert->execute()) {
-                $register_success = "Account created successfully! You can now log in with your credentials.";
-                // Optional: Auto-switch to login form after successful registration
-                echo "<script>
-                    setTimeout(function() {
-                        toggleForm('login');
-                    }, 2000);
-                </script>";
+    if ($stmt->num_rows === 1) {
+        $stmt->bind_result($user_id, $hashed_password);
+        $stmt->fetch();
+
+        if ($old_password === $hashed_password) {
+            // Update with new password
+            $update_stmt = $conn->prepare("UPDATE users SET password = ? WHERE email = ?");
+            $update_stmt->bind_param("ss", $new_password, $email);
+            if ($update_stmt->execute()) {
+                $forgot_password_success = "Password updated successfully. You can now login with your new password.";
             } else {
-                $register_error = "Something went wrong while creating the account. Please try again.";
+                $forgot_password_error = "Something went wrong. Please try again.";
             }
-            $insert->close();
+        } else {
+            $forgot_password_error = "Old password is incorrect.";
         }
-        $check->close();
+    } else {
+        $forgot_password_error = "No account found with that email.";
     }
+    $stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -104,6 +99,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
     <h1>Welcome to PluggedIn</h1>
     <p>Sign in to your account or create a new one</p>
 
+    <!-- Button group to toggle between forms -->
     <div class="btn-group">
         <button id="loginBtn" class="active" onclick="toggleForm('login')"><i class="fa fa-sign-in"></i>Sign In</button>
         <button id="registerBtn" onclick="toggleForm('register')"><i class="fa fa-user-plus"></i>Register</button>
@@ -122,8 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
             </div>
 
             <div class="terms">
-                <label><input type="checkbox" name="remember"> Remember me</label>
-                <a href="#">Forgot password?</a>
+                <a href="#" id="forgotPasswordLink" onclick="toggleForm('forgotPassword')">Forgot password?</a>
             </div>
             
             <?php if (!empty($login_error)) { echo "<p style='color: red; margin: 10px 0; font-size: 14px;'>$login_error</p>"; } ?>
@@ -132,7 +127,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
         </form>
 
         <!-- Register Form -->
-        <form id="registerForm" method="post" action="">
+        <form id="registerForm" method="post" action="" style="display:none;">
             <div class="name-row">
                 <div>
                     <label for="firstName">First Name</label>
@@ -162,7 +157,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
                 <i onclick="togglePassword('confirmPassword')" class="fa fa-eye"></i>
             </div>
 
-            <!-- Account type is automatically set to Customer - no need for selection -->
             <div style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px; color: #666;">
                 <i class="fa fa-info-circle"></i> Your account will be created as a Customer account
             </div>
@@ -176,31 +170,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
 
             <button type="submit" name="register"><i class="fa fa-user-plus"></i>Create Account</button>
         </form>
+
+        <!-- Forgot Password Form -->
+        <form id="forgotPasswordForm" method="post" action="" style="display:none;">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="oldPassword">Old Password</label>
+            <input type="password" id="oldPassword" name="oldPassword" placeholder="Enter old password" required>
+
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" name="newPassword" placeholder="Enter new password" required>
+
+            <?php if (!empty($forgot_password_error)) { echo "<p style='color: red; margin: 10px 0;'>$forgot_password_error</p>"; } ?>
+            <?php if (!empty($forgot_password_success)) { echo "<p style='color: green; margin: 10px 0;'>$forgot_password_success</p>"; } ?>
+
+            <button type="submit" name="forgot_password">Reset Password</button>
+        </form>
     </div>
 </div>
 
 <script>
+    // Toggle between login, register, and forgot password forms
     function toggleForm(form) {
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
-
-        // Remove active class from all forms and buttons
-        loginForm.classList.remove('active');
-        registerForm.classList.remove('active');
-        loginBtn.classList.remove('active');
-        registerBtn.classList.remove('active');
-
+        const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+        
         if (form === 'login') {
-            loginForm.classList.add('active');
-            loginBtn.classList.add('active');
-        } else {
-            registerForm.classList.add('active');
-            registerBtn.classList.add('active');
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+            forgotPasswordForm.style.display = 'none';
+            setActiveButton('login');
+        } else if (form === 'register') {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+            forgotPasswordForm.style.display = 'none';
+            setActiveButton('register');
+        } else if (form === 'forgotPassword') {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'none';
+            forgotPasswordForm.style.display = 'block';
+            setActiveButton('forgotPassword');
         }
     }
 
+    // Set active button style
+    function setActiveButton(form) {
+        const buttons = document.querySelectorAll('.btn-group button');
+        buttons.forEach(button => {
+            button.classList.remove('active');
+        });
+        
+        const activeButton = document.getElementById(form + 'Btn');
+        activeButton.classList.add('active');
+    }
+
+    // Password visibility toggle
     function togglePassword(id) {
         const input = document.getElementById(id);
         const icon = input.nextElementSibling;
@@ -215,49 +241,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
             icon.classList.add('fa-eye');
         }
     }
-
-    // Password confirmation validation
-    document.getElementById('confirmPassword').addEventListener('input', function() {
-        const password = document.getElementById('regPassword').value;
-        const confirmPassword = this.value;
-        
-        if (password !== confirmPassword) {
-            this.setCustomValidity('Passwords do not match');
-            this.style.borderColor = '#ff4757';
-        } else {
-            this.setCustomValidity('');
-            this.style.borderColor = '';
-        }
-    });
-
-    // Real-time password validation
-    document.getElementById('regPassword').addEventListener('input', function() {
-        const password = this.value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        
-        if (password.length > 0 && password.length < 6) {
-            this.style.borderColor = '#ff4757';
-        } else {
-            this.style.borderColor = '';
-        }
-
-        // Re-validate confirm password if it has content
-        if (confirmPassword.length > 0) {
-            const confirmInput = document.getElementById('confirmPassword');
-            if (password !== confirmPassword) {
-                confirmInput.setCustomValidity('Passwords do not match');
-                confirmInput.style.borderColor = '#ff4757';
-            } else {
-                confirmInput.setCustomValidity('');
-                confirmInput.style.borderColor = '';
-            }
-        }
-    });
-
-    // Initialize default view - show login form
-    document.addEventListener('DOMContentLoaded', function() {
-        toggleForm('login');
-    });
 </script>
 
 </body>
