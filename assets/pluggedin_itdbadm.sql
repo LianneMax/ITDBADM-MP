@@ -3,13 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 20, 2025 at 11:43 PM
+-- Generation Time: Jul 21, 2025 at 01:22 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
-
-DROP DATABASE IF EXISTS pluggedin_itdbadm;
-CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE pluggedin_itdbadm;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -38,6 +34,14 @@ CREATE TABLE `cart` (
   `quantity` int(11) NOT NULL DEFAULT 1,
   `date_added` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
+(18, 1, 5, 1, '2025-07-21 10:03:27'),
+(19, 1, 10, 1, '2025-07-21 10:30:06');
 
 -- --------------------------------------------------------
 
@@ -90,8 +94,19 @@ INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
 
 CREATE TABLE `isfavorite` (
   `user_id` int(11) NOT NULL,
-  `product_code` int(11) DEFAULT NULL
+  `product_code` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
+
+--
+-- Dumping data for table `isfavorite`
+--
+
+INSERT INTO `isfavorite` (`user_id`, `product_code`) VALUES
+(1, 5),
+(1, 6),
+(1, 7),
+(1, 8),
+(1, 10);
 
 -- --------------------------------------------------------
 
@@ -247,7 +262,7 @@ ALTER TABLE `currencies`
 -- Indexes for table `isfavorite`
 --
 ALTER TABLE `isfavorite`
-  ADD PRIMARY KEY (`user_id`),
+  ADD PRIMARY KEY (`user_id`,`product_code`),
   ADD KEY `product_code_idx` (`product_code`);
 
 --
@@ -297,7 +312,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `orders`
