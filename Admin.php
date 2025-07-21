@@ -1,16 +1,16 @@
 <?php
 session_start();
-require_once '../includes/db.php';
+require_once 'includes/db.php';
 
 // Check if admin is logged in
-if (!isset($_SESSION['admin_id'])) {
-    header("Location: ../login.php");
+if (!isset($_SESSION['user_id'])) {
+    header("Location: Login.php");
     exit();
-}
+} $userId = $_SESSION['user_id'];
 
 // Fetch Data
-$products = $conn->query("SELECT * FROM products ORDER BY created_at DESC");
-$staff = $conn->query("SELECT * FROM users WHERE role = 'staff'");
+$products = $conn->query("SELECT * FROM products ORDER BY product_code DESC");
+$staff = $conn->query("SELECT * FROM users WHERE user_role = 'staff'");
 $orders = $conn->query("SELECT * FROM orders ORDER BY order_date DESC");
 ?>
 
