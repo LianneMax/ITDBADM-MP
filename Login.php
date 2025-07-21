@@ -32,10 +32,29 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
             $_SESSION['email'] = $email;
             $_SESSION['logged_in'] = true;
 
-            // Redirect to homepage
+            // Role-based redirection
+            $redirect_page = "";
+            $role_message = "";
+            
+            switch (strtolower($user_role)) {
+                case 'admin':
+                    $redirect_page = 'Admin.php';
+                    $role_message = 'Welcome Admin! Redirecting to admin dashboard...';
+                    break;
+                case 'staff':
+                    $redirect_page = 'staff_main.php';
+                    $role_message = 'Welcome Staff! Redirecting to staff panel...';
+                    break;
+                case 'customer':
+                default:
+                    $redirect_page = 'Index.php';
+                    $role_message = 'Welcome Customer! Redirecting to homepage...';
+                    break;
+            }
+
             echo "<script>
-                alert('Login successful! Redirecting...');
-                window.location.href = 'Index.php';
+                alert('$role_message');
+                window.location.href = '$redirect_page';
             </script>";
             exit;
         } else {
