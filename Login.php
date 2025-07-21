@@ -136,9 +136,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
             <label for="regEmail">Email</label>
             <input type="email" id="regEmail" name="regEmail" placeholder="john.doe@example.com" required>
 
-            <label for="phone">Phone</label>
-            <input type="tel" id="phone" name="phone" placeholder="+1 234 567 8900">
-
             <label for="regPassword">Password</label>
             <div class="password-container">
                 <input type="password" id="regPassword" name="regPassword" placeholder="Create a password" required>
