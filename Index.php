@@ -74,7 +74,9 @@ if ($category_result->num_rows > 0) {
                                 <i class="far fa-eye"></i>
                                 Quick View
                             </button>
-                            <button class="product-favorite-btn" onclick="event.stopPropagation(); toggleProductFavorite('<?php echo htmlspecialchars($product['product_code']); ?>', this)">
+                            <button class="product-favorite-btn" 
+                                    id="favorite-card-<?php echo htmlspecialchars($product['product_code']); ?>"
+                                    onclick="event.stopPropagation(); toggleFavorite('<?php echo htmlspecialchars($product['product_code']); ?>')">
                                 <i class="far fa-heart"></i>
                             </button>
                         </div>
@@ -160,11 +162,11 @@ if ($category_result->num_rows > 0) {
                 </div>
                 
                 <div class="modal-actions">
-                    <button class="add-to-cart-btn" id="modalAddToCart">
+                    <button class="add-to-cart-btn" id="modalAddToCart" data-product-code="">
                         <i class="fas fa-shopping-cart"></i>
                         Add to Cart
                     </button>
-                    <button class="modal-favorite-btn" id="modalFavoriteBtn" onclick="toggleModalFavorite()">
+                    <button class="modal-favorite-btn" id="modalFavoriteBtn" onclick="toggleFavorite()">
                         <i class="far fa-heart"></i>
                     </button>
                 </div>
@@ -178,6 +180,9 @@ let currentProduct = null;
 
 // Store products data for modal
 const productsData = <?php echo json_encode($products); ?>;
+
+// Store favorite states
+let favoriteStates = {};
 
 document.addEventListener("DOMContentLoaded", () => {
     // Category filter functionality
@@ -218,7 +223,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled])");
     addToCartButtons.forEach(button => {
         button.addEventListener("click", () => {
-            addToCart(button.getAttribute("data-product-code"), 1, button);
+            const productCode = button.getAttribute("data-product-code");
+            if (productCode) {
+                addToCart(productCode, 1, button);
+            }
         });
     });
 
@@ -226,7 +234,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('modalAddToCart').addEventListener('click', () => {
         if (currentProduct) {
             const quantity = document.getElementById('modalQuantity').value;
-            addToCart(currentProduct.product_code, quantity, document.getElementById('modalAddToCart'));
+            const modalAddToCartBtn = document.getElementById('modalAddToCart');
+            addToCart(currentProduct.product_code, quantity, modalAddToCartBtn);
         }
     });
 
@@ -260,6 +269,9 @@ function openProductModal(productCode) {
     const addToCartBtn = document.getElementById('modalAddToCart');
     const quantityInput = document.getElementById('modalQuantity');
     
+    // Set the product code for the modal add to cart button
+    addToCartBtn.setAttribute('data-product-code', product.product_code);
+    
     if (product.stock_qty > 0) {
         stockElement.innerHTML = `Stock: <span class="stock-available">${product.stock_qty} available</span>`;
         addToCartBtn.disabled = false;
@@ -274,6 +286,9 @@ function openProductModal(productCode) {
     
     // Reset quantity
     document.getElementById('modalQuantity').value = 1;
+    
+    // Sync favorite state
+    syncFavoriteState(product.product_code);
     
     // Show modal
     document.getElementById('productModal').style.display = 'block';
@@ -305,36 +320,55 @@ function decreaseQuantity() {
     }
 }
 
-function toggleProductFavorite(productCode, buttonElement) {
-    // Toggle the active class
-    buttonElement.classList.toggle('active');
-    
-    // Change the icon
-    const icon = buttonElement.querySelector('i');
-    if (buttonElement.classList.contains('active')) {
-        icon.className = 'fas fa-heart';
-    } else {
-        icon.className = 'far fa-heart';
+function toggleFavorite(productCode) {
+    // If no productCode is passed, use current product (modal context)
+    if (!productCode && currentProduct) {
+        productCode = currentProduct.product_code;
     }
+    
+    if (!productCode) return;
+    
+    // Toggle favorite state
+    favoriteStates[productCode] = !favoriteStates[productCode];
+    
+    // Update both card and modal favorite buttons
+    updateFavoriteButtons(productCode, favoriteStates[productCode]);
     
     // Here you can add AJAX call to save favorite status to database
-    console.log('Toggled favorite for product:', productCode);
+    console.log('Toggled favorite for product:', productCode, 'State:', favoriteStates[productCode]);
 }
 
-function toggleModalFavorite() {
-    const favoriteBtn = document.getElementById('modalFavoriteBtn');
-    favoriteBtn.classList.toggle('active');
+function updateFavoriteButtons(productCode, isFavorite) {
+    // Update card favorite button
+    const cardFavoriteBtn = document.getElementById(`favorite-card-${productCode}`);
+    if (cardFavoriteBtn) {
+        updateFavoriteButton(cardFavoriteBtn, isFavorite);
+    }
     
-    const icon = favoriteBtn.querySelector('i');
-    if (favoriteBtn.classList.contains('active')) {
+    // Update modal favorite button (only if current product matches)
+    if (currentProduct && currentProduct.product_code === productCode) {
+        const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
+        updateFavoriteButton(modalFavoriteBtn, isFavorite);
+    }
+}
+
+function updateFavoriteButton(buttonElement, isFavorite) {
+    const icon = buttonElement.querySelector('i');
+    
+    if (isFavorite) {
+        buttonElement.classList.add('active');
         icon.className = 'fas fa-heart';
     } else {
+        buttonElement.classList.remove('active');
         icon.className = 'far fa-heart';
     }
-    
-    if (currentProduct) {
-        console.log('Toggled favorite for product:', currentProduct.product_code);
-    }
+}
+
+function syncFavoriteState(productCode) {
+    // Sync the modal favorite button with the current favorite state
+    const modalFavoriteBtn = document.getElementById('modalFavoriteBtn');
+    const isFavorite = favoriteStates[productCode] || false;
+    updateFavoriteButton(modalFavoriteBtn, isFavorite);
 }
 
 function addToCart(productCode, quantity, buttonElement) {
@@ -349,14 +383,14 @@ function addToCart(productCode, quantity, buttonElement) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            const originalText = buttonElement.textContent;
+            const originalText = buttonElement.innerHTML;
             const originalColor = buttonElement.style.backgroundColor;
             
-            buttonElement.textContent = "Added!";
+            buttonElement.innerHTML = '<i class="fas fa-check"></i> Added!';
             buttonElement.style.backgroundColor = "#27ae60";
             
             setTimeout(() => {
-                buttonElement.textContent = originalText;
+                buttonElement.innerHTML = originalText;
                 buttonElement.style.backgroundColor = originalColor || "#7f4af1";
             }, 1500);
         } else {
