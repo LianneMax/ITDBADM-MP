@@ -472,3 +472,34 @@
         text-align: center;
         color: #888;
         }
+
+        /* Search CSS */
+        .search-bar {
+            position: relative;
+        }
+
+        .search-bar input {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .search-bar input:focus {
+            border-color: #7f4af1;
+            box-shadow: 0 0 0 3px rgba(127, 74, 241, 0.1);
+        }
+
+        .search-bar .fa-search {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .search-bar .fa-search:hover {
+            color: #7f4af1;
+        }
+
+        /* Search results highlighting (optional) */
+        .product-card.search-highlight .product-title {
+            background-color: rgba(255, 235, 59, 0.3);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }

@@ -1,6 +1,7 @@
 <?php 
 include('includes/header.php'); 
 include('includes/db.php');
+
 // Fetch all products with their categories
 $sql = "SELECT p.product_code, p.product_name, p.description, p.stock_qty, p.srp_php, p.category_code, c.category_name 
         FROM products p 
@@ -188,39 +189,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Load favorite states from database
     loadFavoriteStates();
     
-    // Category filter functionality
-    const categoryButtons = document.querySelectorAll(".category-btn");
-    const productCards = document.querySelectorAll(".product-card");
-    const noProductsMessage = document.getElementById("noProductsMessage");
+    // Initialize search functionality
+    initializeSearch();
     
-    categoryButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            categoryButtons.forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
-            
-            const selectedCategory = button.getAttribute("data-category");
-            let visibleCount = 0;
-            
-            productCards.forEach(card => {
-                const productCategory = card.getAttribute("data-category");
-                
-                if (selectedCategory === "all" || productCategory === selectedCategory) {
-                    card.style.display = "block";
-                    card.classList.remove("hidden");
-                    visibleCount++;
-                } else {
-                    card.style.display = "none";
-                    card.classList.add("hidden");
-                }
-            });
-            
-            if (visibleCount === 0 && selectedCategory !== "all") {
-                noProductsMessage.style.display = "block";
-            } else {
-                noProductsMessage.style.display = "none";
-            }
-        });
-    });
+    // Initialize category filter functionality
+    initializeCategoryFilter();
 
     // Add to cart functionality for product cards only (exclude modal button)
     const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled]):not(#modalAddToCart)");
@@ -255,6 +228,124 @@ document.addEventListener("DOMContentLoaded", () => {
         event.stopPropagation();
     });
 });
+
+function initializeSearch() {
+    const searchInput = document.querySelector('.search-bar input');
+    const searchIcon = document.querySelector('.search-bar .fa-search');
+    
+    // Handle search on Enter key press
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    // Handle search on icon click
+    searchIcon.addEventListener('click', performSearch);
+    
+    // Real-time search as user types (with debounce)
+    let searchTimeout;
+    searchInput.addEventListener('input', () => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            if (searchInput.value.length >= 2 || searchInput.value.length === 0) {
+                performSearch();
+            }
+        }, 500);
+    });
+}
+
+function initializeCategoryFilter() {
+    const categoryButtons = document.querySelectorAll(".category-btn");
+    
+    categoryButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            // Clear search when switching categories
+            const searchInput = document.querySelector('.search-bar input');
+            searchInput.value = '';
+            
+            categoryButtons.forEach(btn => btn.classList.remove("active"));
+            button.classList.add("active");
+            
+            const selectedCategory = button.getAttribute("data-category");
+            filterByCategory(selectedCategory);
+        });
+    });
+}
+
+function performSearch() {
+    const searchInput = document.querySelector('.search-bar input');
+    const searchTerm = searchInput.value.trim();
+    
+    // Reset category filter to "all" when searching
+    const allCategoryBtn = document.querySelector('.category-btn[data-category="all"]');
+    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+    allCategoryBtn.classList.add('active');
+    
+    filterProducts(searchTerm);
+}
+
+function filterProducts(searchTerm) {
+    const productCards = document.querySelectorAll('.product-card');
+    const noProductsMessage = document.getElementById('noProductsMessage');
+    let visibleCount = 0;
+    
+    productCards.forEach(card => {
+        const productName = card.querySelector('.product-title').textContent.toLowerCase();
+        const productDescription = card.querySelector('.product-description')?.textContent.toLowerCase() || '';
+        const productCategory = card.querySelector('.product-category')?.textContent.toLowerCase() || '';
+        
+        const matchesSearch = searchTerm === '' || 
+            productName.includes(searchTerm.toLowerCase()) ||
+            productDescription.includes(searchTerm.toLowerCase()) ||
+            productCategory.includes(searchTerm.toLowerCase());
+        
+        if (matchesSearch) {
+            card.style.display = 'block';
+            card.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+            card.classList.add('hidden');
+        }
+    });
+    
+    // Show/hide no products message
+    if (visibleCount === 0 && searchTerm !== '') {
+        noProductsMessage.style.display = 'block';
+        noProductsMessage.querySelector('h3').textContent = 'No products found';
+        noProductsMessage.querySelector('p').textContent = `No products match "${searchTerm}". Try different keywords.`;
+    } else {
+        noProductsMessage.style.display = 'none';
+    }
+}
+
+function filterByCategory(selectedCategory) {
+    const productCards = document.querySelectorAll(".product-card");
+    const noProductsMessage = document.getElementById("noProductsMessage");
+    let visibleCount = 0;
+    
+    productCards.forEach(card => {
+        const productCategory = card.getAttribute("data-category");
+        
+        if (selectedCategory === "all" || productCategory === selectedCategory) {
+            card.style.display = "block";
+            card.classList.remove("hidden");
+            visibleCount++;
+        } else {
+            card.style.display = "none";
+            card.classList.add("hidden");
+        }
+    });
+    
+    if (visibleCount === 0 && selectedCategory !== "all") {
+        noProductsMessage.style.display = "block";
+        noProductsMessage.querySelector('h3').textContent = 'No products found in this category';
+        noProductsMessage.querySelector('p').textContent = 'Try selecting a different category or browse all products.';
+    } else {
+        noProductsMessage.style.display = "none";
+    }
+}
 
 function loadFavoriteStates() {
     fetch('get_favorites.php')
