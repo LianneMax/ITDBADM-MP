@@ -1,8 +1,6 @@
 <?php
 session_start(); // Start the session
 
-
-
 // Handle logout (before any output, including HTML)
 if (isset($_GET['logout'])) {
     session_destroy();
@@ -60,7 +58,9 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles/users.css">
 </head>
 <body>
@@ -73,121 +73,158 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       </a>
     </div>
     
-    <div class="user-header">
-      <div class="user-header-left">
-        <div class="avatar"><?= $userInitials ?></div>
-        <div class="user-info">
-          <h2>
-            <?= htmlspecialchars($fullName) ?>
-            <span class="user-role-badge"><?= htmlspecialchars($userResult['user_role']) ?></span>
-          </h2>
-          <p><?= htmlspecialchars($userResult['email']) ?></p>
-        </div>
+    <!-- User header with avatar and member info -->
+    <div class="user-profile-header">
+      <div class="avatar-large"><?= $userInitials ?></div>
+      <div class="user-details">
+        <h1><?= htmlspecialchars($fullName) ?></h1>
+        <p class="member-since">Member since <?= date('n/j/Y') ?></p>
       </div>
-      <a href="?logout=1" class="logout-btn" onclick="return confirmLogout()">🚪 Logout</a>
     </div>
     
-    <div class="tabs">
+    <!-- Tab Navigation -->
+    <div class="tab-navigation">
       <button class="tab-btn active" onclick="showTab('profile')">Profile</button>
       <button class="tab-btn" onclick="showTab('orders')">Order History</button>
     </div>
     
-    <!-- Profile Section -->
+    <!-- Profile Tab Content -->
     <div id="profile" class="tab-content active">
-      <h3>📑 Profile Information</h3>
-      <div class="info-grid">
-        <div>
-          <label>First Name</label>
-          <input value="<?= htmlspecialchars($userResult['first_name']) ?>" readonly>
+      <div class="profile-section">
+        <div class="section-header">
+          <h2>
+            <svg class="edit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+            </svg>
+            Profile Information
+          </h2>
         </div>
-        <div>
-          <label>Last Name</label>
-          <input value="<?= htmlspecialchars($userResult['last_name']) ?>" readonly>
-        </div>
-        <div>
-          <label>Email</label>
-          <input value="<?= htmlspecialchars($userResult['email']) ?>" readonly>
-        </div>
-        <div>
-          <label>User Role</label>
-          <input value="<?= htmlspecialchars($userResult['user_role']) ?>" readonly>
-        </div>
-        <div>
-          <label>User ID</label>
-          <input value="<?= htmlspecialchars($userResult['user_id']) ?>" readonly>
-        </div>
-      </div>
-      <button class="edit-btn">✏️ Edit Profile</button>
-    </div>
-    
-    <!-- Order History Section -->
-    <div id="orders" class="tab-content">
-      <h3>📦 Order History</h3>
-      <?php if ($orderResults->num_rows > 0): ?>
-        <?php while ($order = $orderResults->fetch_assoc()): ?>
-          <div class="order-card">
-            <div class="order-header">
-              <strong>Order #<?= htmlspecialchars($order['order_id']) ?></strong> — <?= htmlspecialchars($order['order_date']) ?>
-              <span class="status <?= strtolower(str_replace(' ', '', $order['order_status'])) ?>">
-                <?= htmlspecialchars(strtoupper($order['order_status'])) ?>
-              </span>
-            </div>
-            
-            <div class="order-amount">
-              ₱<?= number_format($order['totalamt_php'], 2) ?>
-              <?php if ($order['currency_name'] && $order['currency_name'] !== 'PHP'): ?>
-                <div class="currency-info">
-                  Original currency: <?= htmlspecialchars($order['currency_name']) ?>
-                </div>
-              <?php endif; ?>
-            </div>
-            
-            <div class="order-tracking">
-              <div class="step <?= !empty($order['order_date']) ? 'done' : '' ?>">
-                1. Ordered<br><?= htmlspecialchars($order['order_date']) ?>
-              </div>
-              <div class="step <?= in_array(strtolower($order['order_status']), ['processing', 'shipped', 'completed']) ? 'done' : '' ?>">
-                2. Processing
-              </div>
-              <div class="step <?= in_array(strtolower($order['order_status']), ['shipped', 'completed']) ? 'done' : '' ?>">
-                3. Shipped
-              </div>
-              <div class="step <?= strtolower($order['order_status']) === 'completed' ? 'done' : '' ?>">
-                4. Delivered
+        
+        <div class="profile-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="full_name">Full Name</label>
+              <div class="input-container">
+                <input id="full_name" type="text" value="<?= htmlspecialchars($fullName) ?>" readonly>
+                <button class="field-menu-btn">⋯</button>
               </div>
             </div>
             
-            <button class="details-btn" onclick="viewOrderDetails(<?= $order['order_id'] ?>)">
-              View Details
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input id="email" type="email" value="<?= htmlspecialchars($userResult['email']) ?>" readonly>
+            </div>
+          </div>
+                    
+          <div class="form-actions">
+            <button class="edit-profile-btn">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
+              </svg>
+              Edit Profile
+            </button>
+            
+            <button class="logout-btn" onclick="return confirmLogout()">
+              <a href="?logout=1" style="text-decoration: none; color: inherit;">
+                Logout
+              </a>
             </button>
           </div>
-        <?php endwhile; ?>
-      <?php else: ?>
-        <div class="no-orders">
-          <p>📦 No orders found</p>
-          <p>You haven't placed any orders yet.</p>
         </div>
-      <?php endif; ?>
+      </div>
+    </div>
+    
+    <!-- Order History Tab Content -->
+    <div id="orders" class="tab-content">
+      <div class="orders-section">
+        <div class="section-header">
+          <h2>Order History</h2>
+        </div>
+        
+        <?php if ($orderResults->num_rows > 0): ?>
+          <div class="orders-list">
+            <?php while ($order = $orderResults->fetch_assoc()): ?>
+              <div class="order-card">
+                <div class="order-header">
+                  <div class="order-info">
+                    <h3>Order #<?= htmlspecialchars($order['order_id']) ?></h3>
+                    <p class="order-date"><?= date('M j, Y', strtotime($order['order_date'])) ?></p>
+                  </div>
+                  <span class="status-badge <?= strtolower(str_replace(' ', '-', $order['order_status'])) ?>">
+                    <?= htmlspecialchars(strtoupper($order['order_status'])) ?>
+                  </span>
+                </div>
+                
+                <div class="order-amount">
+                  <span class="amount">₱<?= number_format($order['totalamt_php'], 2) ?></span>
+                  <?php if ($order['currency_name'] && $order['currency_name'] !== 'PHP'): ?>
+                    <span class="currency-note">Original: <?= htmlspecialchars($order['currency_name']) ?></span>
+                  <?php endif; ?>
+                </div>
+                
+                <div class="order-progress">
+                  <div class="progress-step <?= !empty($order['order_date']) ? 'completed' : '' ?>">
+                    <div class="step-dot"></div>
+                    <div class="step-label">
+                      <span>Ordered</span>
+                      <small><?= date('M j', strtotime($order['order_date'])) ?></small>
+                    </div>
+                  </div>
+                  
+                  <div class="progress-step <?= in_array(strtolower($order['order_status']), ['processing', 'shipped', 'completed']) ? 'completed' : '' ?>">
+                    <div class="step-dot"></div>
+                    <div class="step-label">
+                      <span>Processing</span>
+                    </div>
+                  </div>
+                  
+                  <div class="progress-step <?= in_array(strtolower($order['order_status']), ['shipped', 'completed']) ? 'completed' : '' ?>">
+                    <div class="step-dot"></div>
+                    <div class="step-label">
+                      <span>Shipped</span>
+                    </div>
+                  </div>
+                  
+                  <div class="progress-step <?= strtolower($order['order_status']) === 'completed' ? 'completed' : '' ?>">
+                    <div class="step-dot"></div>
+                    <div class="step-label">
+                      <span>Delivered</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <button class="view-details-btn" onclick="viewOrderDetails(<?= $order['order_id'] ?>)">
+                  View Details
+                </button>
+              </div>
+            <?php endwhile; ?>
+          </div>
+        <?php else: ?>
+          <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No orders found</h3>
+            <p>You haven't placed any orders yet.</p>
+          </div>
+        <?php endif; ?>
+      </div>
     </div>
   </div>
   
   <script>
     function showTab(tab) {
+      // Remove active class from all tab contents and buttons
       document.querySelectorAll(".tab-content").forEach(div => div.classList.remove("active"));
       document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      
+      // Add active class to selected tab content and button
       document.getElementById(tab).classList.add("active");
       event.target.classList.add("active");
     }
     
     function viewOrderDetails(orderId) {
       // You can implement this function to show order details
-      // For now, just alert the order ID
       alert('View details for Order #' + orderId);
-      
-      // You could redirect to an order details page:
       // window.location.href = 'order_details.php?order_id=' + orderId;
-      
-      // Or open a modal with order details via AJAX
     }
     
     function confirmLogout() {
