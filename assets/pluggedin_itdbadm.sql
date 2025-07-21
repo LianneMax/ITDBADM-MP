@@ -1,11 +1,15 @@
+DROP DATABASE IF EXISTS pluggedin_itdbadm;
+CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE pluggedin_itdbadm;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jul 21, 2025 at 01:22 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1
+-- Generation Time: Jul 21, 2025 at 07:06 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -89,6 +93,30 @@ INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `customer_deletion_log`
+--
+
+CREATE TABLE `customer_deletion_log` (
+  `user_id` int(11) NOT NULL,
+  `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory_log`
+--
+
+CREATE TABLE `inventory_log` (
+  `product_code` int(11) NOT NULL,
+  `old_qty` int(11) DEFAULT NULL,
+  `new_qty` int(11) DEFAULT NULL,
+  `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `isfavorite`
 --
 
@@ -152,6 +180,19 @@ CREATE TABLE `order_items` (
 INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantity`, `srp_php`, `totalprice_php`) VALUES
 (1, 20, 5, 1, 7000, 7000),
 (2, 20, 3, 1, 5000, 5000);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `order_status_log`
+--
+
+CREATE TABLE `order_status_log` (
+  `order_id` int(11) NOT NULL,
+  `old_status` enum('paid','unpaid') DEFAULT NULL,
+  `new_status` enum('paid','unpaid') DEFAULT NULL,
+  `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -259,6 +300,19 @@ ALTER TABLE `currencies`
   ADD PRIMARY KEY (`currency_code`);
 
 --
+-- Indexes for table `customer_deletion_log`
+--
+ALTER TABLE `customer_deletion_log`
+  ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `inventory_log`
+--
+ALTER TABLE `inventory_log`
+  ADD PRIMARY KEY (`product_code`,`change_date`),
+  ADD KEY `change_date_idx` (`change_date`);
+
+--
 -- Indexes for table `isfavorite`
 --
 ALTER TABLE `isfavorite`
@@ -281,6 +335,13 @@ ALTER TABLE `order_items`
   ADD KEY `product_code_idx` (`product_code`),
   ADD KEY `idx_order_id` (`order_id`),
   ADD KEY `idx_product_code` (`product_code`);
+
+--
+-- Indexes for table `order_status_log`
+--
+ALTER TABLE `order_status_log`
+  ADD PRIMARY KEY (`order_id`,`change_date`),
+  ADD KEY `change_date_idx` (`change_date`);
 
 --
 -- Indexes for table `payments`
