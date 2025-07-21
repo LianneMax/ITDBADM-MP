@@ -88,66 +88,62 @@ if (session_status() == PHP_SESSION_NONE) {
         document.getElementById('side-cart').classList.remove('open');
     });
 
-    function loadCart() {
-        fetch('get_cart.php?action=get')
-        .then(response => response.json())
-        .then(data => {
-            const container = document.getElementById('cart-items');
-            container.innerHTML = '';
-            
-            if (data.items.length === 0) {
-                container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
-            } else {
-                // Add cart items
-                data.items.forEach(item => {
-                    container.innerHTML += `
-                    <div class="cart-item" data-cart-id="${item.cart_id}">
-                        <div class="item-image">
-                            <i class="fas fa-headphones"></i>
-                        </div>
-                        <div class="item-info">
-                            <strong>${item.name}</strong>
-                            <div class="item-brand">TechPeripherals</div>
-                            <p class="item-price">₱${item.price}</p>
-                            <div class="quantity-controls">
-                                <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">−</button>
-                                <span class="quantity">${item.quantity}</span>
-                                <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})">+</button>
-                            </div>
-                        </div>
-                        <button class="remove-btn" onclick="removeItem(${item.cart_id})">🗑</button>
-                    </div>
-                    `;
-                });
-                
-                // Calculate subtotal and tax
-                const subtotal = parseFloat(data.total.replace(/,/g, ''));
-                const tax = subtotal * 0.12; // 12% tax
-                const total = subtotal + tax;
-                
-                // Add cart summary
+function loadCart() {
+    fetch('get_cart.php?action=get')
+    .then(response => response.json())
+    .then(data => {
+        const container = document.getElementById('cart-items');
+        container.innerHTML = '';
+        
+        if (data.items.length === 0) {
+            container.innerHTML = '<p class="empty-cart-msg">Your cart is empty.</p>';
+        } else {
+            // Add cart items
+            data.items.forEach(item => {
                 container.innerHTML += `
-                <div class="cart-summary">
-                    <div class="summary-row">
-                        <span class="summary-label">Subtotal</span>
-                        <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                <div class="cart-item" data-cart-id="${item.cart_id}">
+                    <div class="item-image">
+                        <i class="fas fa-headphones"></i>
                     </div>
-                    <div class="summary-row">
-                        <span class="summary-label">Tax (12%)</span>
-                        <span class="summary-value">₱${tax.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <div class="item-info">
+                        <strong>${item.name}</strong>
+                        <div class="item-brand">TechPeripherals</div>
+                        <p class="item-price">₱${item.price}</p>
+                        <div class="quantity-controls">
+                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">−</button>
+                            <span class="quantity">${item.quantity}</span>
+                            <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity + 1})">+</button>
+                        </div>
                     </div>
-                    <div class="summary-row total-row">
-                        <span class="summary-label">Total</span>
-                        <span class="summary-value">₱${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
-                    </div>
+                    <button class="remove-btn" onclick="removeItem(${item.cart_id})">
+                    <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
                 `;
-            }
-        })
-        .catch(error => {
-            console.error('Error loading cart:', error);
-        });
-    }
+            });
+            
+            // Calculate subtotal without tax
+            const subtotal = parseFloat(data.total.replace(/,/g, ''));
+
+            // Add cart summary (without tax)
+            container.innerHTML += `
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal</span>
+                    <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+                <div class="summary-row total-row">
+                    <span class="summary-label">Total</span>
+                    <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                </div>
+            </div>
+            `;
+        }
+    })
+    .catch(error => {
+        console.error('Error loading cart:', error);
+    });
+}
 
     function updateQuantity(cartId, newQuantity) {
         if (newQuantity < 1) {

@@ -161,24 +161,35 @@
             flex-shrink: 0; /* Add this to prevent number shrinking */
         }
 
-        /* Remove Button */
+
         .remove-btn {
             position: absolute;
             top: 16px;
             right: 24px;
             background: none;
             border: none;
-            color: #ff4757;
-            font-size: 18px;
+            color: #911a24;
             cursor: pointer;
-            padding: 4px;
+            padding: 2px;
             line-height: 1;
             transition: opacity 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .remove-btn:hover {
+        
+        .remove-btn:hover i{
             opacity: 0.7;
+            color: #5a1117;
         }
+
+        
+        .remove-btn i {
+            font-size: 20px; 
+            color: inherit; 
+        }
+
 
         /* Cart Summary */
         .cart-summary {
@@ -228,13 +239,14 @@
         }
 
         .checkout-btn {
+            font-family: 'Outfit', sans-serif;  /* Apply Outfit font */
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #f4c430 0%, #e6b02e 100%);
+            background: #f4c430;
             color: #ffffff;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -266,10 +278,6 @@
                 gap: 12px;
             }
             
-            .quantity-controls {
-                align-self: stretch;
-                justify-content: center;
-            }
             
             .remove-btn {
                 position: static;
