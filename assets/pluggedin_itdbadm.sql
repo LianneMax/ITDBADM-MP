@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 21, 2025 at 07:06 PM
+-- Generation Time: Jul 21, 2025 at 07:59 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +24,32 @@ SET time_zone = "+00:00";
 --
 -- Database: `pluggedin_itdbadm`
 --
+
+DELIMITER $$
+--
+-- Procedures
+--
+CREATE DEFINER=`root`@`localhost` PROCEDURE `add_new_product` (IN `product_name` VARCHAR(45), IN `category_code` INT, IN `description` VARCHAR(45), IN `stock_qty` INT, IN `srp_php` FLOAT)   BEGIN
+   INSERT INTO products (product_name, category_code, description, stock_qty, srp_php)
+   VALUES (product_name, category_code, description, stock_qty, srp_php);
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_customer_account` (IN `customer_id` INT)   BEGIN
+   DELETE FROM orders WHERE user_id = customer_id;
+   DELETE FROM cart WHERE user_id = customer_id;
+   DELETE FROM isfavorite WHERE user_id = customer_id;
+   DELETE FROM users WHERE user_id = customer_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_order_status` (IN `input_order_id` INT, IN `new_status` VARCHAR(45))   BEGIN
+   UPDATE orders SET order_status = new_status WHERE order_id = input_order_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `update_product_stock` (IN `input_product_code` INT, IN `new_stock` INT)   BEGIN
+   UPDATE products SET stock_qty = new_stock WHERE product_code = input_product_code;
+END$$
+
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -158,6 +184,19 @@ CREATE TABLE `orders` (
 INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
 (20, 1, '2025-07-21', 12000, 'Processing', 3);
 
+--
+-- Triggers `orders`
+--
+DELIMITER $$
+CREATE TRIGGER `order_status_logging_trigger` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
+   IF OLD.order_status != NEW.order_status THEN
+      INSERT INTO order_status_log (order_id, old_status, new_status, change_date)
+      VALUES (NEW.order_id, OLD.order_status, NEW.order_status, current_timestamp());
+   END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -180,6 +219,20 @@ CREATE TABLE `order_items` (
 INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantity`, `srp_php`, `totalprice_php`) VALUES
 (1, 20, 5, 1, 7000, 7000),
 (2, 20, 3, 1, 5000, 5000);
+
+--
+-- Triggers `order_items`
+--
+DELIMITER $$
+CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `order_items` FOR EACH ROW BEGIN
+   DECLARE available_qty INT;
+   SELECT stock_qty INTO available_qty FROM products WHERE product_code = NEW.product_code;
+   IF available_qty < NEW.quantity THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient inventory';
+   END IF;
+END
+$$
+DELIMITER ;
 
 -- --------------------------------------------------------
 
@@ -248,6 +301,19 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
 (10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000);
 
+--
+-- Triggers `products`
+--
+DELIMITER $$
+CREATE TRIGGER `inventory_adjustment_trigger` AFTER UPDATE ON `products` FOR EACH ROW BEGIN
+   IF OLD.stock_qty != NEW.stock_qty THEN
+      INSERT INTO inventory_log (product_code, old_qty, new_qty, change_date)
+      VALUES (NEW.product_code, OLD.stock_qty, NEW.stock_qty, current_timestamp());
+   END IF;
+END
+$$
+DELIMITER ;
+
 -- --------------------------------------------------------
 
 --
@@ -274,6 +340,17 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 (4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
 (5, 'Customer', 'David', 'Tan', 'david_tan@dlsu.edu.ph', 'david'),
 (6, 'Customer', 'Ella', 'Santos', 'ella_santos@dlsu.edu.ph', 'ella');
+
+--
+-- Triggers `users`
+--
+DELIMITER $$
+CREATE TRIGGER `customer_deletion_log_trigger` AFTER DELETE ON `users` FOR EACH ROW BEGIN
+   INSERT INTO customer_deletion_log (user_id, deletion_date)
+   VALUES (OLD.user_id, current_timestamp());
+END
+$$
+DELIMITER ;
 
 --
 -- Indexes for dumped tables
