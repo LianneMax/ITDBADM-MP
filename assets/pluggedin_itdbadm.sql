@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 22, 2025 at 02:08 PM
+-- Generation Time: Jul 22, 2025 at 02:47 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -142,8 +142,32 @@ CREATE TABLE `customer_deletion_log` (
 --
 
 INSERT INTO `customer_deletion_log` (`user_id`, `first_name`, `last_name`, `deletion_date`) VALUES
+(6, 'Ella', 'Santos', '2025-07-22 12:38:12'),
 (8, 'Delete ', 'This', '2025-07-22 10:53:21'),
 (9, 'Delete ', 'This', '2025-07-22 10:53:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_edit_log`
+--
+
+CREATE TABLE `customer_edit_log` (
+  `log_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `old_first_name` varchar(255) DEFAULT NULL,
+  `new_first_name` varchar(255) DEFAULT NULL,
+  `old_last_name` varchar(255) DEFAULT NULL,
+  `new_last_name` varchar(255) DEFAULT NULL,
+  `edit_time` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `customer_edit_log`
+--
+
+INSERT INTO `customer_edit_log` (`log_id`, `user_id`, `old_first_name`, `new_first_name`, `old_last_name`, `new_last_name`, `edit_time`) VALUES
+(1, 10, 'juls', 'juls', 'test', 'Lammoglia', '2025-07-22 20:45:40');
 
 -- --------------------------------------------------------
 
@@ -346,7 +370,6 @@ CREATE TRIGGER `inventory_adjustment_trigger` AFTER UPDATE ON `products` FOR EAC
 END
 $$
 DELIMITER ;
-
 DELIMITER $$
 CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
    DECLARE available_qty INT;
@@ -357,7 +380,6 @@ CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH
 END
 $$
 DELIMITER ;
-
 DELIMITER $$
 CREATE TRIGGER `product_deletion_log_trigger` AFTER DELETE ON `products` FOR EACH ROW BEGIN
   INSERT INTO product_deletion_log (
@@ -410,7 +432,7 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 (2, 'Customer', 'Max', 'Balbastro', 'maxbalbastro@gmail.com', 'ilovejuls'),
 (3, 'Admin', 'Brian', 'Lopez', 'brian_lopez@dlsu.edu.ph', 'brian'),
 (4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
-(6, 'Customer', 'Ella', 'Santos', 'ella_santos@dlsu.edu.ph', 'ella');
+(10, 'Customer', 'juls', 'Lammoglia', 'julstest@gmail.com', 'julianna');
 
 --
 -- Triggers `users`
@@ -419,6 +441,29 @@ DELIMITER $$
 CREATE TRIGGER `customer_deletion_log_trigger` AFTER DELETE ON `users` FOR EACH ROW BEGIN
    INSERT INTO customer_deletion_log (user_id, first_name, last_name, deletion_date)
    VALUES (OLD.user_id, OLD.first_name, OLD.last_name, CURRENT_TIMESTAMP());
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `log_customer_edits` AFTER UPDATE ON `users` FOR EACH ROW BEGIN
+    IF LOWER(OLD.user_role) = 'customer' AND (
+        OLD.first_name <> NEW.first_name OR
+        OLD.last_name <> NEW.last_name
+    ) THEN
+        INSERT INTO customer_edit_log (
+            user_id,
+            old_first_name,
+            new_first_name,
+            old_last_name,
+            new_last_name
+        ) VALUES (
+            OLD.user_id,
+            OLD.first_name,
+            NEW.first_name,
+            OLD.last_name,
+            NEW.last_name
+        );
+    END IF;
 END
 $$
 DELIMITER ;
@@ -452,6 +497,13 @@ ALTER TABLE `currencies`
 --
 ALTER TABLE `customer_deletion_log`
   ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `inventory_log`
@@ -530,6 +582,12 @@ ALTER TABLE `cart`
   MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
+-- AUTO_INCREMENT for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
@@ -557,7 +615,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- Constraints for dumped tables
@@ -569,6 +627,12 @@ ALTER TABLE `users`
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_code`) REFERENCES `products` (`product_code`);
+
+--
+-- Constraints for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  ADD CONSTRAINT `customer_edit_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `isfavorite`
