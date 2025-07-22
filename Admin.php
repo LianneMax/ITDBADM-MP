@@ -44,16 +44,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'update_stock':
-                // Use update_product_stock stored procedure
-                $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
-                $stmt->bind_param("ii", $_POST['product_code'], $_POST['new_stock']);
-                if ($stmt->execute()) {
-                    $success = "Stock updated successfully! Inventory adjustment trigger logged the change.";
-                } else {
-                    $error = "Error updating stock: " . $conn->error;
-                }
-                $stmt->close();
-                break;
+              // Use update_product_stock stored procedure
+              $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
+              $stmt->bind_param("ii", $_POST['product_code'], $_POST['new_stock']);
+              
+              try {
+                  if ($stmt->execute()) {
+                      $success = "Stock updated successfully! Inventory adjustment trigger logged the change.";
+                  } else {
+                      $error = "Error updating stock: " . $conn->error;
+                  }
+              } catch (Exception $e) {
+                  $error = "Error. Invalid stock quantity.";
+              }
+              $stmt->close();
+              break;
 
             case 'add_staff':
                 // Add staff member
@@ -276,7 +281,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </div>
   </div>
 
-  <!-- Staff Tab -->
+  <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
     <form method="POST" class="form-grid">
       <h3>👤 Add New Staff</h3>
