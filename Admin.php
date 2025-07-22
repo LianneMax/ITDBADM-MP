@@ -21,6 +21,13 @@ if ($user['user_role'] !== 'Admin') {
     exit();
 }
 
+// Handle logout (before any output, including HTML)
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: Index.php"); // Redirect to homepage
+    exit();
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
@@ -151,7 +158,11 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 <body>
 <div class="container">
   <h2>Admin Dashboard</h2>
-  <div class="user-info">Welcome, Admin | <a href="logout.php">Logout</a></div>
+  <div class="user-info">Welcome, Admin | 
+    <button class="logout-btn" onclick="return confirmLogout()">
+      <a href="?logout=1"> Logout </a>
+    </button>
+  </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('products')">Products</button>
@@ -450,6 +461,10 @@ function quickRestock(productCode, productName) {
       alert('Error updating stock');
     });
   }
+}
+
+function confirmLogout() {
+      return confirm('Are you sure you want to logout?');
 }
 
 function closeRestockModal() {
