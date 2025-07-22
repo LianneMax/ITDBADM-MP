@@ -16,7 +16,7 @@ if (isset($_SESSION['user_id'])) {
         $role = $user['user_role'];
 
         // Allow deletion only if role is 'customer'
-        if ($role === 'customer') {
+        if (strtolower(trim($role)) === 'customer') {
             $deleteStmt = $conn->prepare("DELETE FROM users WHERE user_id = ?");
             $deleteStmt->bind_param("i", $userId);
             $deleteStmt->execute();
