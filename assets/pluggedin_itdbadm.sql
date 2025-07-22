@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 22, 2025 at 01:21 PM
+-- Generation Time: Jul 22, 2025 at 02:08 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -39,6 +39,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_customer_account` (IN `custo
    DELETE FROM cart WHERE user_id = customer_id;
    DELETE FROM isfavorite WHERE user_id = customer_id;
    DELETE FROM users WHERE user_id = customer_id;
+END$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_product` (IN `input_product_code` INT)   BEGIN
+  DELETE FROM cart WHERE product_code = input_product_code;
+  DELETE FROM isfavorite WHERE product_code = input_product_code;
+  DELETE FROM order_items WHERE product_code = input_product_code;
+
+  DELETE FROM products WHERE product_code = input_product_code;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `update_order_status` (IN `input_order_id` INT, IN `new_status` VARCHAR(45))   BEGIN
@@ -162,7 +170,8 @@ INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`
 (6, 1900, -1, '2025-07-22 10:43:02'),
 (6, -1, 100, '2025-07-22 11:04:25'),
 (8, 1200, 1201, '2025-07-22 11:01:53'),
-(11, 1, 100, '2025-07-21 20:45:23');
+(11, 1, 100, '2025-07-21 20:45:23'),
+(12, 1, 100, '2025-07-22 11:52:10');
 
 -- --------------------------------------------------------
 
@@ -206,7 +215,7 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
-(20, 1, '2025-07-21', 12000, 'Processing', 3);
+(20, 1, '2025-07-21', 12000, 'Delivered', 3);
 
 --
 -- Triggers `orders`
@@ -263,7 +272,11 @@ CREATE TABLE `order_status_log` (
 
 INSERT INTO `order_status_log` (`order_id`, `old_status`, `new_status`, `change_date`) VALUES
 (20, 'Delivered', 'Shipped', '2025-07-22 10:20:31'),
-(20, 'Shipped', 'Processing', '2025-07-22 10:23:45');
+(20, 'Shipped', 'Processing', '2025-07-22 10:23:45'),
+(20, 'Processing', 'Delivered', '2025-07-22 11:32:51'),
+(20, 'Delivered', 'Processing', '2025-07-22 11:34:07'),
+(20, 'Processing', 'Shipped', '2025-07-22 11:34:27'),
+(20, 'Shipped', 'Delivered', '2025-07-22 11:34:43');
 
 -- --------------------------------------------------------
 
@@ -319,7 +332,7 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
 (10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000),
 (11, 1, 'test', 'test', 100, 1),
-(12, 4, 'test2', 'test2', 1, 1);
+(12, 4, 'test2', 'test2', 100, 1);
 
 --
 -- Triggers `products`
@@ -333,6 +346,7 @@ CREATE TRIGGER `inventory_adjustment_trigger` AFTER UPDATE ON `products` FOR EAC
 END
 $$
 DELIMITER ;
+
 DELIMITER $$
 CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
    DECLARE available_qty INT;
@@ -343,6 +357,34 @@ CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH
 END
 $$
 DELIMITER ;
+
+DELIMITER $$
+CREATE TRIGGER `product_deletion_log_trigger` AFTER DELETE ON `products` FOR EACH ROW BEGIN
+  INSERT INTO product_deletion_log (
+    product_code, product_name, category_code,
+    description, deletion_date
+  )
+  VALUES (
+    OLD.product_code, OLD.product_name, OLD.category_code,
+    OLD.description, CURRENT_TIMESTAMP()
+  );
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_deletion_log`
+--
+
+CREATE TABLE `product_deletion_log` (
+  `product_code` int(11) NOT NULL,
+  `product_name` varchar(45) DEFAULT NULL,
+  `category_code` int(11) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -463,6 +505,12 @@ ALTER TABLE `payments`
 ALTER TABLE `products`
   ADD PRIMARY KEY (`product_code`),
   ADD KEY `category_code_idx` (`category_code`);
+
+--
+-- Indexes for table `product_deletion_log`
+--
+ALTER TABLE `product_deletion_log`
+  ADD PRIMARY KEY (`product_code`);
 
 --
 -- Indexes for table `users`

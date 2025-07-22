@@ -21,6 +21,13 @@ if ($user['user_role'] !== 'Admin') {
     exit();
 }
 
+// Handle logout (before any output, including HTML)
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: Index.php"); // Redirect to homepage
+    exit();
+}
+
 // Handle form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
@@ -42,18 +49,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $stmt->close();
                 break;
-
-            case 'update_stock':
-                // Use update_product_stock stored procedure
-                $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
-                $stmt->bind_param("ii", $_POST['product_code'], $_POST['new_stock']);
+            
+            case 'delete_product':
+                // Use delete_product stored procedure
+                $stmt = $conn->prepare("CALL delete_product(?)");
+                $stmt->bind_param("i", $_POST['product_id']);
                 if ($stmt->execute()) {
-                    $success = "Stock updated successfully! Inventory adjustment trigger logged the change.";
+                    $success = "Product added successfully! Inventory trigger logged the new stock.";
                 } else {
-                    $error = "Error updating stock: " . $conn->error;
+                    $error = "Error adding product: " . $conn->error;
                 }
                 $stmt->close();
                 break;
+
+            case 'update_stock':
+              // Use update_product_stock stored procedure
+              $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
+              $stmt->bind_param("ii", $_POST['product_code'], $_POST['new_stock']);
+              
+              try {
+                  if ($stmt->execute()) {
+                      $success = "Stock updated successfully! Inventory adjustment trigger logged the change.";
+                  } else {
+                      $error = "Error updating stock: " . $conn->error;
+                  }
+              } catch (Exception $e) {
+                  $error = "Error. Invalid stock quantity.";
+              }
+              $stmt->close();
+              break;
 
             case 'add_staff':
                 // Add staff member
@@ -146,7 +170,11 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 <body>
 <div class="container">
   <h2>Admin Dashboard</h2>
-  <div class="user-info">Welcome, Admin | <a href="logout.php">Logout</a></div>
+  <div class="user-info">Welcome, Admin | 
+    <button class="logout-btn" onclick="return confirmLogout()">
+      <a href="?logout=1"> Logout </a>
+    </button>
+  </div>
 
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('products')">Products</button>
@@ -210,10 +238,12 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td>₱<?= number_format($p['srp_php'], 2) ?></td>
             <td><?= htmlspecialchars($p['description'] ?? '') ?></td>
             <td>
-              <a href="process/edit_product.php?id=<?= $p['product_code'] ?>" title="Edit">✏️</a>
-              <a href="process/delete_product.php?id=<?= $p['product_code'] ?>" 
-                 onclick="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>?')" 
-                 title="Delete">🗑️</a>
+                <a href="process/edit_product.php?id=<?= $p['product_code'] ?>" title="Edit">✏️</a>
+                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
+                    <input type="hidden" name="action" value="delete_product">
+                    <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
+                    <button type="submit" style="background:none;border:none;cursor:pointer;" title="Delete">🗑️</button>
+                </form>
             </td>
           </tr>
           <?php endwhile; ?>
@@ -276,7 +306,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </div>
   </div>
 
-  <!-- Staff Tab -->
+  <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
     <form method="POST" class="form-grid">
       <h3>👤 Add New Staff</h3>
@@ -445,6 +475,10 @@ function quickRestock(productCode, productName) {
       alert('Error updating stock');
     });
   }
+}
+
+function confirmLogout() {
+      return confirm('Are you sure you want to logout?');
 }
 
 function closeRestockModal() {
