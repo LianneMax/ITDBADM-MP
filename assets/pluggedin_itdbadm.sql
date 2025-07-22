@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 22, 2025 at 02:47 PM
+-- Generation Time: Jul 22, 2025 at 04:22 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -79,7 +79,8 @@ CREATE TABLE `cart` (
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
 (18, 1, 5, 1, '2025-07-21 10:03:27'),
-(19, 1, 10, 1, '2025-07-21 10:30:06');
+(19, 1, 10, 1, '2025-07-21 10:30:06'),
+(21, 10, 6, 1, '2025-07-22 14:17:34');
 
 -- --------------------------------------------------------
 
@@ -193,6 +194,7 @@ INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`
 (5, -1, 100, '2025-07-22 11:03:57'),
 (6, 1900, -1, '2025-07-22 10:43:02'),
 (6, -1, 100, '2025-07-22 11:04:25'),
+(6, 100, 101, '2025-07-22 13:19:42'),
 (8, 1200, 1201, '2025-07-22 11:01:53'),
 (11, 1, 100, '2025-07-21 20:45:23'),
 (12, 1, 100, '2025-07-22 11:52:10');
@@ -350,7 +352,7 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
 (4, 4, 'Razer DeathAdder', 'Gaming Mouse', 100, 3500),
 (5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 100, 7000),
-(6, 1, 'Airpods Max', 'Wireless Headphones', 100, 35000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 101, 35000),
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1201, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
@@ -411,6 +413,35 @@ CREATE TABLE `product_deletion_log` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `staff_assigned_orders`
+--
+
+CREATE TABLE `staff_assigned_orders` (
+  `user_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Triggers `staff_assigned_orders`
+--
+DELIMITER $$
+CREATE TRIGGER `check_assignedorders` BEFORE INSERT ON `staff_assigned_orders` FOR EACH ROW BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM staff_assigned_orders
+        WHERE order_id = NEW.order_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order is already assigned to a staff member.';
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -432,7 +463,8 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 (2, 'Customer', 'Max', 'Balbastro', 'maxbalbastro@gmail.com', 'ilovejuls'),
 (3, 'Admin', 'Brian', 'Lopez', 'brian_lopez@dlsu.edu.ph', 'brian'),
 (4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
-(10, 'Customer', 'juls', 'Lammoglia', 'julstest@gmail.com', 'julianna');
+(10, 'Customer', 'juls', 'Lammoglia', 'julstest@gmail.com', 'julianna'),
+(11, 'Customer', 'juls', 'test', 'test@gmail.com', 'julianna');
 
 --
 -- Triggers `users`
@@ -579,7 +611,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT for table `customer_edit_log`
@@ -591,13 +623,13 @@ ALTER TABLE `customer_edit_log`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `payments`
@@ -615,7 +647,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables

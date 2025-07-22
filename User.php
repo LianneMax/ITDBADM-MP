@@ -1,68 +1,60 @@
 <?php
 session_start(); // Start the session
 
-// Handle logout (before any output, including HTML)
-if (isset($_GET['logout'])) {
-    session_destroy();
-    header("Location: index.php"); // Redirect to home page
-    exit();
-}
-
-// Make sure user is logged in (before any output)
+// Redirect if not logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: Login.php"); // Redirect to login page if not logged in
-    exit();
-}
-
-require_once 'includes/db.php'; // Connection to DB
-
-$userId = $_SESSION['user_id'];
-
-// Fetch user profile
-$stmt = $conn->prepare("SELECT user_id, user_role, first_name, last_name, email, password FROM users WHERE user_id = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
-$userResult = $stmt->get_result()->fetch_assoc();
-
-if (!$userResult) {
-    // User not found, redirect to login
-    session_destroy();
     header("Location: Login.php");
     exit();
 }
 
+require_once 'includes/db.php'; // Your DB connection file
 
-if (isset($_GET['error'])) {
-    if ($_GET['error'] === 'unauthorized') {
-        echo "<p class='error-msg'>Only customers can delete their account.</p>";
-    } elseif ($_GET['error'] === 'notfound') {
-        echo "<p class='error-msg'>User not found.</p>";
+$userId = $_SESSION['user_id'];
+
+// Handle order assignment
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $orderId = $_POST['order_id'];
+    $action = $_POST['action'];
+
+    if ($action === 'assign') {
+        // Insert into staff_assigned_orders
+        $stmt = $conn->prepare("INSERT INTO staff_assigned_orders (user_id, order_id, status) VALUES (?, ?, ?)");
+        $status = 'ASSIGNED';
+        $stmt->bind_param("iis", $userId, $orderId, $status);
+        $stmt->execute();
+    }
+
+    header('Location: available_orders.php');
+    exit();
+}
+
+// Fetch assigned order IDs
+$assignedQuery = "SELECT order_id FROM staff_assigned_orders";
+$assignedResult = $conn->query($assignedQuery);
+
+$assignedOrderIds = [];
+while ($row = $assignedResult->fetch_assoc()) {
+    $assignedOrderIds[] = $row['order_id'];
+}
+
+// Fetch available orders (excluding assigned ones)
+$ordersQuery = "SELECT * FROM orders";
+$ordersResult = $conn->query($ordersQuery);
+
+$availableOrders = [];
+while ($order = $ordersResult->fetch_assoc()) {
+    if (!in_array($order['order_id'], $assignedOrderIds)) {
+        $availableOrders[$order['order_id']] = [
+            'customer' => 'Customer Name', // Replace with actual customer data if available
+            'phone' => 'Customer Phone',   // Replace with actual phone if available
+            'total' => $order['totalamt_php'],
+            'date' => $order['order_date'],
+            'items' => [], // Add items if needed
+        ];
     }
 }
-
-// Create full name from first_name and last_name
-$fullName = trim($userResult['first_name'] . ' ' . $userResult['last_name']);
-
-// Fetch user orders with currency information
-$orderQuery = $conn->prepare("
-    SELECT o.order_id, o.order_date, o.totalamt_php, o.order_status, c.currency_name, c.price_php 
-    FROM orders o 
-    LEFT JOIN currencies c ON o.currency_code = c.currency_code 
-    WHERE o.user_id = ? 
-    ORDER BY o.order_date DESC
-");
-$orderQuery->bind_param("i", $userId);
-$orderQuery->execute();
-$orderResults = $orderQuery->get_result();
-
-// Function to get user initials for avatar
-function getUserInitials($firstName, $lastName) {
-    $firstInitial = !empty($firstName) ? strtoupper($firstName[0]) : '';
-    $lastInitial = !empty($lastName) ? strtoupper($lastName[0]) : '';
-    return $firstInitial . $lastInitial;
-}
-$userInitials = getUserInitials($userResult['first_name'], $userResult['last_name']);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

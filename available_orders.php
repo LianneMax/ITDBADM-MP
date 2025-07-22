@@ -1,34 +1,4 @@
 <?php
-// Sample orders data - replace with your actual data loading
-$availableOrders = [
-    'ORD-005' => [
-        'customer' => 'Tom Hardy',
-        'total' => 189.99,
-        'status' => 'PENDING',
-        'priority' => 'LOW',
-        'date' => '7/18/2024',
-        'items' => ['Gaming Headset Pro', 'Wireless Mouse'],
-        'phone' => '+1 (555) 123-4567'
-    ],
-    'ORD-006' => [
-        'customer' => 'Emma Stone',
-        'total' => 299.99,
-        'status' => 'PENDING',
-        'priority' => 'MEDIUM',
-        'date' => '7/18/2024',
-        'items' => ['Mechanical Keyboard', 'Mouse Pad'],
-        'phone' => '+1 (555) 987-6543'
-    ],
-    'ORD-007' => [
-        'customer' => 'John Smith',
-        'total' => 899.99,
-        'status' => 'PENDING',
-        'priority' => 'HIGH',
-        'date' => '7/19/2024',
-        'items' => ['Ultra-wide Monitor'],
-        'phone' => '+1 (555) 456-7890'
-    ]
-];
 
 // Handle order actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -52,33 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-function getStatusBadge($status) {
-    switch (strtoupper($status)) {
-        case 'PENDING':
-            return '<span class="status-badge low-stock">Pending</span>';
-        case 'ASSIGNED':
-            return '<span class="status-badge in-stock">Assigned</span>';
-        case 'PICKED_UP':
-            return '<span class="status-badge in-stock">Picked Up</span>';
-        case 'CANCELLED':
-            return '<span class="status-badge critical">Cancelled</span>';
-        default:
-            return '<span class="status-badge out-of-stock">Unknown</span>';
-    }
-}
-
-function getPriorityBadge($priority) {
-    switch (strtoupper($priority)) {
-        case 'LOW':
-            return '<span class="status-badge in-stock">Low</span>';
-        case 'MEDIUM':
-            return '<span class="status-badge low-stock">Medium</span>';
-        case 'HIGH':
-            return '<span class="status-badge critical">High</span>';
-        default:
-            return '<span class="status-badge out-of-stock">Normal</span>';
-    }
-}
 ?>
 <!DOCTYPE html>
 <html>
@@ -182,8 +125,6 @@ function getPriorityBadge($priority) {
                         <th>Order ID</th>
                         <th>Customer</th>
                         <th>Total</th>
-                        <th>Status</th>
-                        <th>Priority</th>
                         <th>Order Date</th>
                         <th>Actions</th>
                     </tr>
@@ -204,8 +145,6 @@ function getPriorityBadge($priority) {
                                 <div class="order-details phone-number"><?php echo htmlspecialchars($order['phone']); ?></div>
                             </td>
                             <td class="price-text">$<?php echo number_format($order['total'], 2); ?></td>
-                            <td><?php echo getStatusBadge($order['status']); ?></td>
-                            <td><?php echo getPriorityBadge($order['priority']); ?></td>
                             <td>
                                 <div><?php echo htmlspecialchars($order['date']); ?></div>
                                 <div class="items-list">
@@ -221,12 +160,6 @@ function getPriorityBadge($priority) {
                                         </svg>
                                     </button>
                                     
-                                    <form method="POST" class="action-form" onsubmit="return confirmPickup('<?php echo $orderId; ?>')">
-                                        <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($orderId); ?>">
-                                        <input type="hidden" name="action" value="pickup">
-                                        <button type="submit" class="pickup-btn">Pick Up</button>
-                                    </form>
-                                    
                                     <form method="POST" class="action-form" onsubmit="return confirmAssign('<?php echo $orderId; ?>')">
                                         <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($orderId); ?>">
                                         <input type="hidden" name="action" value="assign">
@@ -240,49 +173,7 @@ function getPriorityBadge($priority) {
                 </tbody>
             </table>
         </div>
-
-        <!-- Order Summary Card -->
-        <?php if (!empty($availableOrders)): ?>
-        <div class="card">
-            <div class="card-header">
-                <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                </svg>
-                <h2 class="card-title">Order Summary</h2>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px;">
-                <div>
-                    <h3 style="margin: 0 0 8px 0; color: #374151; font-size: 16px;">Total Orders</h3>
-                    <p style="margin: 0; font-size: 24px; font-weight: 700; color: #1a202c;">
-                        <?php echo count($availableOrders); ?>
-                    </p>
-                </div>
-                
-                <div>
-                    <h3 style="margin: 0 0 8px 0; color: #374151; font-size: 16px;">High Priority</h3>
-                    <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;">
-                        <?php 
-                        $highPriority = array_filter($availableOrders, function($order) {
-                            return strtoupper($order['priority']) === 'HIGH';
-                        });
-                        echo count($highPriority);
-                        ?>
-                    </p>
-                </div>
-                
-                <div>
-                    <h3 style="margin: 0 0 8px 0; color: #374151; font-size: 16px;">Total Value</h3>
-                    <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;">
-                        $<?php 
-                        $totalValue = array_sum(array_column($availableOrders, 'total'));
-                        echo number_format($totalValue, 2);
-                        ?>
-                    </p>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+        
     </div>
 
     <script>
@@ -293,7 +184,7 @@ function getPriorityBadge($priority) {
             
             if (order) {
                 let itemsList = order.items.join(', ');
-                alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nPhone: ${order.phone}\nTotal: $${order.total}\nItems: ${itemsList}\nPriority: ${order.priority}\nDate: ${order.date}`);
+                alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nPhone: ${order.phone}\nTotal: $${order.total}\nItems: ${itemsList}\nDate: ${order.date}`);
             }
         }
 
