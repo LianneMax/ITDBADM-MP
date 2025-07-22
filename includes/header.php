@@ -194,6 +194,38 @@ function loadCart() {
             console.error('Error removing item:', error);
         });
     }
+
+       </script>
+       
+    <!-- Currency Dropdown JavaScript -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const currencyButton = document.getElementById('currencyDropdownButton');
+        const currencyDropdown = document.getElementById('currencyDropdownContent');
+        const dropdownItems = document.querySelectorAll('.dropdown-item');
+        // Toggle dropdown
+        currencyButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // prevent window click from firing
+            currencyDropdown.style.display = currencyDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+        // Selecting currency
+        dropdownItems.forEach(item => {
+            item.addEventListener('click', function(event) {
+                event.stopPropagation();
+                dropdownItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                currencyButton.innerHTML = this.innerHTML + ' <i class="fas fa-caret-down"></i>';
+                currencyDropdown.style.display = 'none';
+            });
+        });
+        // Close dropdown if clicking outside
+        window.addEventListener('click', function(event) {
+            // Close only if click is outside dropdown
+            if (!currencyButton.contains(event.target) && !currencyDropdown.contains(event.target)) {
+                currencyDropdown.style.display = 'none';
+            }
+        });
+    });
 </script>
 </body>
 </html>
