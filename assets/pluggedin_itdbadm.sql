@@ -1,4 +1,4 @@
--- for juls
+-- for eddy
 DROP DATABASE IF EXISTS pluggedin_itdbadm;
 CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pluggedin_itdbadm;
@@ -8,11 +8,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
-<<<<<<< HEAD
 -- Generation Time: Jul 22, 2025 at 04:36 PM
-=======
--- Generation Time: Jul 22, 2025 at 02:47 PM
->>>>>>> parent of e7e7f08 (users and available orders ?)
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -46,6 +42,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_customer_account` (IN `custo
    DELETE FROM users WHERE user_id = customer_id;
 END$$
 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_product` (IN `input_product_code` INT)   BEGIN
+  DELETE FROM cart WHERE product_code = input_product_code;
+  DELETE FROM isfavorite WHERE product_code = input_product_code;
+  DELETE FROM order_items WHERE product_code = input_product_code;
+
+  DELETE FROM products WHERE product_code = input_product_code;
+END$$
+
 CREATE DEFINER=`root`@`localhost` PROCEDURE `update_order_status` (IN `input_order_id` INT, IN `new_status` VARCHAR(45))   BEGIN
    UPDATE orders SET order_status = new_status WHERE order_id = input_order_id;
 END$$
@@ -75,12 +79,7 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
-<<<<<<< HEAD
 (21, 10, 6, 1, '2025-07-22 14:17:34');
-=======
-(18, 1, 5, 1, '2025-07-21 10:03:27'),
-(19, 1, 10, 1, '2025-07-21 10:30:06');
->>>>>>> parent of e7e7f08 (users and available orders ?)
 
 -- --------------------------------------------------------
 
@@ -113,18 +112,17 @@ INSERT INTO `categories` (`category_code`, `category_name`) VALUES
 CREATE TABLE `currencies` (
   `currency_code` int(11) NOT NULL,
   `price_php` varchar(45) DEFAULT NULL,
-  `currency_name` varchar(45) DEFAULT NULL,
-  `symbol` varchar(5) DEFAULT NULL
+  `currency_name` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `currencies`
 --
 
-INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`, `symbol`) VALUES
-(1, '0.041', 'KRW', '₩'),
-(2, '57.24', 'USD', '$'),
-(3, '1', 'PHP', '₱');
+INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
+(1, '0.041', 'KRW'),
+(2, '57.24', 'USD'),
+(3, '1', 'PHP');
 
 -- --------------------------------------------------------
 
@@ -134,8 +132,42 @@ INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`, `symbol
 
 CREATE TABLE `customer_deletion_log` (
   `user_id` int(11) NOT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
   `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `customer_deletion_log`
+--
+
+INSERT INTO `customer_deletion_log` (`user_id`, `first_name`, `last_name`, `deletion_date`) VALUES
+(6, 'Ella', 'Santos', '2025-07-22 12:38:12'),
+(8, 'Delete ', 'This', '2025-07-22 10:53:21'),
+(9, 'Delete ', 'This', '2025-07-22 10:53:00');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `customer_edit_log`
+--
+
+CREATE TABLE `customer_edit_log` (
+  `log_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `old_first_name` varchar(255) DEFAULT NULL,
+  `new_first_name` varchar(255) DEFAULT NULL,
+  `old_last_name` varchar(255) DEFAULT NULL,
+  `new_last_name` varchar(255) DEFAULT NULL,
+  `edit_time` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `customer_edit_log`
+--
+
+INSERT INTO `customer_edit_log` (`log_id`, `user_id`, `old_first_name`, `new_first_name`, `old_last_name`, `new_last_name`, `edit_time`) VALUES
+(1, 10, 'juls', 'juls', 'test', 'Lammoglia', '2025-07-22 20:45:40');
 
 -- --------------------------------------------------------
 
@@ -162,6 +194,7 @@ INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`
 (5, 100, 99, '2025-07-22 14:36:47'),
 (6, 1900, -1, '2025-07-22 10:43:02'),
 (6, -1, 100, '2025-07-22 11:04:25'),
+(6, 100, 101, '2025-07-22 13:19:42'),
 (8, 1200, 1201, '2025-07-22 11:01:53'),
 (10, 800, 799, '2025-07-22 14:36:47'),
 (11, 1, 100, '2025-07-21 20:45:23'),
@@ -219,7 +252,7 @@ DELIMITER $$
 CREATE TRIGGER `order_status_logging_trigger` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
    IF OLD.order_status != NEW.order_status THEN
       INSERT INTO order_status_log (order_id, old_status, new_status, change_date)
-      VALUES (NEW.order_id, OLD.order_status, NEW.order_status, current_timestamp());
+      VALUES (NEW.order_id, OLD.order_status, NEW.order_status, NOW());
    END IF;
 END
 $$
@@ -258,10 +291,22 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantit
 
 CREATE TABLE `order_status_log` (
   `order_id` int(11) NOT NULL,
-  `old_status` enum('paid','unpaid') DEFAULT NULL,
-  `new_status` enum('paid','unpaid') DEFAULT NULL,
+  `old_status` varchar(45) DEFAULT NULL,
+  `new_status` varchar(45) DEFAULT NULL,
   `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_status_log`
+--
+
+INSERT INTO `order_status_log` (`order_id`, `old_status`, `new_status`, `change_date`) VALUES
+(20, 'Delivered', 'Shipped', '2025-07-22 10:20:31'),
+(20, 'Shipped', 'Processing', '2025-07-22 10:23:45'),
+(20, 'Processing', 'Delivered', '2025-07-22 11:32:51'),
+(20, 'Delivered', 'Processing', '2025-07-22 11:34:07'),
+(20, 'Processing', 'Shipped', '2025-07-22 11:34:27'),
+(20, 'Shipped', 'Delivered', '2025-07-22 11:34:43');
 
 -- --------------------------------------------------------
 
@@ -311,15 +356,10 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
 (4, 4, 'Razer DeathAdder', 'Gaming Mouse', 100, 3500),
-<<<<<<< HEAD
 (5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 99, 7000),
 (6, 1, 'Airpods Max', 'Wireless Headphones', 101, 35000),
-=======
-(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 100, 7000),
-(6, 1, 'Airpods Max', 'Wireless Headphones', 100, 35000),
->>>>>>> parent of e7e7f08 (users and available orders ?)
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
-(8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
+(8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1201, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
 (10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 799, 9000),
 (11, 1, 'test', 'test', 100, 1),
@@ -377,6 +417,35 @@ CREATE TABLE `product_deletion_log` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `staff_assigned_orders`
+--
+
+CREATE TABLE `staff_assigned_orders` (
+  `user_id` int(11) DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Triggers `staff_assigned_orders`
+--
+DELIMITER $$
+CREATE TRIGGER `check_assignedorders` BEFORE INSERT ON `staff_assigned_orders` FOR EACH ROW BEGIN
+    IF EXISTS (
+        SELECT 1
+        FROM staff_assigned_orders
+        WHERE order_id = NEW.order_id
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Order is already assigned to a staff member.';
+    END IF;
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -398,16 +467,39 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 (2, 'Customer', 'Max', 'Balbastro', 'maxbalbastro@gmail.com', 'ilovejuls'),
 (3, 'Admin', 'Brian', 'Lopez', 'brian_lopez@dlsu.edu.ph', 'brian'),
 (4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
-(5, 'Customer', 'David', 'Tan', 'david_tan@dlsu.edu.ph', 'david'),
-(6, 'Customer', 'Ella', 'Santos', 'ella_santos@dlsu.edu.ph', 'ella');
+(10, 'Customer', 'juls', 'Lammoglia', 'julstest@gmail.com', 'julianna'),
+(11, 'Customer', 'juls', 'test', 'test@gmail.com', 'julianna');
 
 --
 -- Triggers `users`
 --
 DELIMITER $$
 CREATE TRIGGER `customer_deletion_log_trigger` AFTER DELETE ON `users` FOR EACH ROW BEGIN
-   INSERT INTO customer_deletion_log (user_id, deletion_date)
-   VALUES (OLD.user_id, current_timestamp());
+   INSERT INTO customer_deletion_log (user_id, first_name, last_name, deletion_date)
+   VALUES (OLD.user_id, OLD.first_name, OLD.last_name, CURRENT_TIMESTAMP());
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `log_customer_edits` AFTER UPDATE ON `users` FOR EACH ROW BEGIN
+    IF LOWER(OLD.user_role) = 'customer' AND (
+        OLD.first_name <> NEW.first_name OR
+        OLD.last_name <> NEW.last_name
+    ) THEN
+        INSERT INTO customer_edit_log (
+            user_id,
+            old_first_name,
+            new_first_name,
+            old_last_name,
+            new_last_name
+        ) VALUES (
+            OLD.user_id,
+            OLD.first_name,
+            NEW.first_name,
+            OLD.last_name,
+            NEW.last_name
+        );
+    END IF;
 END
 $$
 DELIMITER ;
@@ -441,6 +533,13 @@ ALTER TABLE `currencies`
 --
 ALTER TABLE `customer_deletion_log`
   ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  ADD PRIMARY KEY (`log_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `inventory_log`
@@ -496,6 +595,12 @@ ALTER TABLE `products`
   ADD KEY `category_code_idx` (`category_code`);
 
 --
+-- Indexes for table `product_deletion_log`
+--
+ALTER TABLE `product_deletion_log`
+  ADD PRIMARY KEY (`product_code`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -510,27 +615,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `cart`
 --
 ALTER TABLE `cart`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-<<<<<<< HEAD
   MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
-=======
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
->>>>>>> parent of e7e7f08 (users and available orders ?)
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-<<<<<<< HEAD
   MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
-=======
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
->>>>>>> parent of e7e7f08 (users and available orders ?)
 
 --
 -- AUTO_INCREMENT for table `payments`
@@ -548,7 +651,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Constraints for dumped tables
@@ -560,6 +663,12 @@ ALTER TABLE `users`
 ALTER TABLE `cart`
   ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `cart_ibfk_2` FOREIGN KEY (`product_code`) REFERENCES `products` (`product_code`);
+
+--
+-- Constraints for table `customer_edit_log`
+--
+ALTER TABLE `customer_edit_log`
+  ADD CONSTRAINT `customer_edit_log_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
 
 --
 -- Constraints for table `isfavorite`

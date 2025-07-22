@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-require_once 'includes/db.php'; // Your DB connection file
+require_once 'includes/db.php'; 
 
 $userId = $_SESSION['user_id'];
 
@@ -99,7 +99,6 @@ while ($order = $ordersResult->fetch_assoc()) {
         $itemsStmt->close();
     }
 }
-?>
 ?>
 
 <!DOCTYPE html>
