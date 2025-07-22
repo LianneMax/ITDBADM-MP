@@ -151,7 +151,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   <div class="tabs">
     <button class="tab-btn active" onclick="showTab('products')">Products</button>
     <button class="tab-btn" onclick="showTab('stock')">Stock</button>
-    <button class="tab-btn" onclick="showTab('staff')">Staff</button>
+    <button class="tab-btn" onclick="showTab('staffusers')">Staff & Users</button>
     <button class="tab-btn" onclick="showTab('orders')">Orders</button>
   </div>
 
@@ -277,7 +277,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   </div>
 
   <!-- Staff Tab -->
-  <div id="staff" class="tab-content">
+  <div id="staffusers" class="tab-content">
     <form method="POST" class="form-grid">
       <h3>👤 Add New Staff</h3>
       <input type="hidden" name="action" value="add_staff">
@@ -377,7 +377,6 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
                 <option value="Processing" <?= $o['order_status'] == 'Processing' ? 'selected' : '' ?>>Processing</option>
                 <option value="Shipped" <?= $o['order_status'] == 'Shipped' ? 'selected' : '' ?>>Shipped</option>
                 <option value="Delivered" <?= $o['order_status'] == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
-                <option value="Cancelled" <?= $o['order_status'] == 'Cancelled' ? 'selected' : '' ?>>Cancelled</option>
               </select>
               <a href="orders/delete.php?id=<?= $o['order_id'] ?>" 
                  onclick="return confirm('Cancel order #<?= $o['order_id'] ?>?')"
