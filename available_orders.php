@@ -37,22 +37,69 @@ while ($row = $assignedResult->fetch_assoc()) {
     $assignedOrderIds[] = $row['order_id'];
 }
 
-// Fetch available orders (excluding assigned ones)
-$ordersQuery = "SELECT * FROM orders";
+// Fetch available orders (excluding assigned ones) with customer details and items
+$ordersQuery = "
+    SELECT 
+        o.order_id,
+        o.user_id,
+        o.order_date,
+        o.totalamt_php,
+        o.order_status,
+        u.first_name,
+        u.last_name,
+        u.email
+    FROM orders o
+    JOIN users u ON o.user_id = u.user_id
+    ORDER BY o.order_date DESC
+";
+
 $ordersResult = $conn->query($ordersQuery);
 
 $availableOrders = [];
 while ($order = $ordersResult->fetch_assoc()) {
     if (!in_array($order['order_id'], $assignedOrderIds)) {
+        // Fetch order items for this order
+        $itemsQuery = "
+            SELECT 
+                oi.quantity,
+                oi.srp_php,
+                oi.totalprice_php,
+                p.product_name,
+                p.description
+            FROM order_items oi
+            JOIN products p ON oi.product_code = p.product_code
+            WHERE oi.order_id = ?
+        ";
+        
+        $itemsStmt = $conn->prepare($itemsQuery);
+        $itemsStmt->bind_param("i", $order['order_id']);
+        $itemsStmt->execute();
+        $itemsResult = $itemsStmt->get_result();
+        
+        $orderItems = [];
+        while ($item = $itemsResult->fetch_assoc()) {
+            $orderItems[] = [
+                'product_name' => $item['product_name'],
+                'description' => $item['description'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['srp_php'],
+                'total_price' => $item['totalprice_php']
+            ];
+        }
+        
         $availableOrders[$order['order_id']] = [
-            'customer' => 'Customer Name', // Replace with actual customer data if available
-            'phone' => 'Customer Phone',   // Replace with actual phone if available
+            'customer' => $order['first_name'] . ' ' . $order['last_name'],
+            'email' => $order['email'],
             'total' => $order['totalamt_php'],
             'date' => $order['order_date'],
-            'items' => [], // Add items if needed
+            'status' => $order['order_status'],
+            'items' => $orderItems
         ];
+        
+        $itemsStmt->close();
     }
 }
+?>
 ?>
 
 <!DOCTYPE html>
@@ -215,8 +262,10 @@ while ($order = $ordersResult->fetch_assoc()) {
             const order = orders[orderId];
             
             if (order) {
-                let itemsList = order.items.join(', ');
-                alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nPhone: ${order.phone}\nTotal: $${order.total}\nItems: ${itemsList}\nDate: ${order.date}`);
+                // Format items list from the array of objects
+                let itemsList = order.items.map(item => 
+                    `${item.product_name} (Qty: ${item.quantity}, ₱${item.unit_price} each, Total: ₱${item.total_price})`).join('\n');
+                alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nEmail: ${order.email}\nStatus: ${order.status}\nTotal: ₱${order.total}\nDate: ${order.date}\n\nItems:\n${itemsList}`);
             }
         }
 
