@@ -107,75 +107,7 @@ while ($order = $ordersResult->fetch_assoc()) {
     <title>Available Orders - Staff Dashboard</title>
     <link rel="stylesheet" href="assets/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .order-details {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 4px;
-        }
-        .phone-number {
-            font-weight: 500;
-            color: #374151;
-        }
-        .action-form {
-            display: inline-block;
-            margin-right: 8px;
-        }
-        .pickup-btn {
-            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-            color: #92400e;
-            font-weight: 600;
-            font-size: 12px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .pickup-btn:hover {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(217, 119, 6, 0.2);
-        }
-        .assign-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            font-weight: 600;
-            font-size: 12px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .assign-btn:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-        }
-        .view-btn {
-            background-color: #f3f4f6;
-            color: #6b7280;
-            border: none;
-            border-radius: 6px;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .view-btn:hover {
-            background-color: #dbeafe;
-            color: #2563eb;
-            transform: translateY(-1px);
-        }
-        .items-list {
-            font-size: 12px;
-            color: #6b7280;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/staff.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -241,7 +173,7 @@ while ($order = $ordersResult->fetch_assoc()) {
                                     <form method="POST" class="action-form" onsubmit="return confirmAssign('<?php echo $orderId; ?>')">
                                         <input type="hidden" name="order_id" value="<?php echo htmlspecialchars($orderId); ?>">
                                         <input type="hidden" name="action" value="assign">
-                                        <button type="submit" class="assign-btn">Assign to Me</button>
+                                        <button type="submit" class="assign-to-btn">Assign to Me</button>
                                     </form>
                                 </div>
                             </td>
