@@ -1,3 +1,4 @@
+-- for juls
 DROP DATABASE IF EXISTS pluggedin_itdbadm;
 CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pluggedin_itdbadm;
@@ -6,10 +7,14 @@ USE pluggedin_itdbadm;
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 22, 2025 at 05:40 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+<<<<<<< HEAD
+-- Generation Time: Jul 22, 2025 at 04:36 PM
+=======
+-- Generation Time: Jul 22, 2025 at 02:47 PM
+>>>>>>> parent of e7e7f08 (users and available orders ?)
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -70,8 +75,12 @@ CREATE TABLE `cart` (
 --
 
 INSERT INTO `cart` (`cart_id`, `user_id`, `product_code`, `quantity`, `date_added`) VALUES
+<<<<<<< HEAD
+(21, 10, 6, 1, '2025-07-22 14:17:34');
+=======
 (18, 1, 5, 1, '2025-07-21 10:03:27'),
 (19, 1, 10, 1, '2025-07-21 10:30:06');
+>>>>>>> parent of e7e7f08 (users and available orders ?)
 
 -- --------------------------------------------------------
 
@@ -141,6 +150,23 @@ CREATE TABLE `inventory_log` (
   `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `inventory_log`
+--
+
+INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`) VALUES
+(4, 60, -100, '2025-07-22 10:56:20'),
+(4, -100, 100, '2025-07-22 10:59:51'),
+(5, 24, -1, '2025-07-22 10:56:01'),
+(5, -1, 100, '2025-07-22 11:03:57'),
+(5, 100, 99, '2025-07-22 14:36:47'),
+(6, 1900, -1, '2025-07-22 10:43:02'),
+(6, -1, 100, '2025-07-22 11:04:25'),
+(8, 1200, 1201, '2025-07-22 11:01:53'),
+(10, 800, 799, '2025-07-22 14:36:47'),
+(11, 1, 100, '2025-07-21 20:45:23'),
+(12, 1, 100, '2025-07-22 11:52:10');
+
 -- --------------------------------------------------------
 
 --
@@ -183,7 +209,8 @@ CREATE TABLE `orders` (
 --
 
 INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
-(20, 1, '2025-07-21', 12000, 'Processing', 3);
+(20, 1, '2025-07-21', 12000, 'Delivered', 3),
+(24, 1, '2025-07-22', 16000, 'Processing', 3);
 
 --
 -- Triggers `orders`
@@ -219,21 +246,9 @@ CREATE TABLE `order_items` (
 
 INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantity`, `srp_php`, `totalprice_php`) VALUES
 (1, 20, 5, 1, 7000, 7000),
-(2, 20, 3, 1, 5000, 5000);
-
---
--- Triggers `order_items`
---
-DELIMITER $$
-CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `order_items` FOR EACH ROW BEGIN
-   DECLARE available_qty INT;
-   SELECT stock_qty INTO available_qty FROM products WHERE product_code = NEW.product_code;
-   IF available_qty < NEW.quantity THEN
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient inventory';
-   END IF;
-END
-$$
-DELIMITER ;
+(2, 20, 3, 1, 5000, 5000),
+(6, 24, 5, 1, 7000, 7000),
+(7, 24, 10, 1, 9000, 9000);
 
 -- --------------------------------------------------------
 
@@ -269,7 +284,8 @@ CREATE TABLE `payments` (
 --
 
 INSERT INTO `payments` (`payment_id`, `currency_code`, `order_id`, `totalamt_php`, `payment_status`, `payment_method`, `payment_date`) VALUES
-(1, 3, 20, 12000, 'unpaid', 'cash', NULL);
+(1, 3, 20, 12000, 'unpaid', 'cash', NULL),
+(2, 3, 24, 16000, 'unpaid', 'cash', NULL);
 
 -- --------------------------------------------------------
 
@@ -294,13 +310,20 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (1, 1, 'Sony WH-1000XM4', 'Noise Cancelling Headphones', 50, 12000),
 (2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
-(4, 4, 'Razer DeathAdder', 'Gaming Mouse', 60, 3500),
-(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 24, 7000),
-(6, 1, 'Airpods Max', 'Wireless Headphones', 1900, 35000),
+(4, 4, 'Razer DeathAdder', 'Gaming Mouse', 100, 3500),
+<<<<<<< HEAD
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 99, 7000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 101, 35000),
+=======
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 100, 7000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 100, 35000),
+>>>>>>> parent of e7e7f08 (users and available orders ?)
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
-(10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000);
+(10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 799, 9000),
+(11, 1, 'test', 'test', 100, 1),
+(12, 4, 'test2', 'test2', 100, 1);
 
 --
 -- Triggers `products`
@@ -314,6 +337,42 @@ CREATE TRIGGER `inventory_adjustment_trigger` AFTER UPDATE ON `products` FOR EAC
 END
 $$
 DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+   -- Ensure that the new stock quantity is not negative
+   IF NEW.stock_qty < 0 THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Stock quantity cannot be negative';
+   END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `product_deletion_log_trigger` AFTER DELETE ON `products` FOR EACH ROW BEGIN
+  INSERT INTO product_deletion_log (
+    product_code, product_name, category_code,
+    description, deletion_date
+  )
+  VALUES (
+    OLD.product_code, OLD.product_name, OLD.category_code,
+    OLD.description, CURRENT_TIMESTAMP()
+  );
+END
+$$
+DELIMITER ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `product_deletion_log`
+--
+
+CREATE TABLE `product_deletion_log` (
+  `product_code` int(11) NOT NULL,
+  `product_name` varchar(45) DEFAULT NULL,
+  `category_code` int(11) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -457,19 +516,33 @@ ALTER TABLE `cart`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
+<<<<<<< HEAD
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+=======
   MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+>>>>>>> parent of e7e7f08 (users and available orders ?)
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
+<<<<<<< HEAD
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+=======
   MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+>>>>>>> parent of e7e7f08 (users and available orders ?)
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `products`
+--
+ALTER TABLE `products`
+  MODIFY `product_code` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
