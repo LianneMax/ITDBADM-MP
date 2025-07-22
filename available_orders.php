@@ -1,28 +1,60 @@
 <?php
+session_start(); // Start the session
 
-// Handle order actions
+// Redirect if not logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: Login.php");
+    exit();
+}
+
+require_once 'includes/db.php'; // Your DB connection file
+
+$userId = $_SESSION['user_id'];
+
+// Handle order assignment
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orderId = $_POST['order_id'];
     $action = $_POST['action'];
-    
-    if (isset($availableOrders[$orderId])) {
-        if ($action === 'pickup') {
-            // Mark order as picked up - in real implementation, update database
-            $availableOrders[$orderId]['status'] = 'PICKED_UP';
-            $availableOrders[$orderId]['pickup_time'] = date('Y-m-d H:i:s');
-            // Remove from available orders or move to different array
-            unset($availableOrders[$orderId]);
-        } elseif ($action === 'assign') {
-            $availableOrders[$orderId]['status'] = 'ASSIGNED';
-            $availableOrders[$orderId]['assigned_to'] = 'Current Staff'; // Replace with actual staff ID
-        }
+
+    if ($action === 'assign') {
+        // Insert into staff_assigned_orders
+        $stmt = $conn->prepare("INSERT INTO staff_assigned_orders (user_id, order_id, status) VALUES (?, ?, ?)");
+        $status = 'ASSIGNED';
+        $stmt->bind_param("iis", $userId, $orderId, $status);
+        $stmt->execute();
     }
-    // Save updated data here
+
     header('Location: available_orders.php');
-    exit;
+    exit();
 }
 
+// Fetch assigned order IDs
+$assignedQuery = "SELECT order_id FROM staff_assigned_orders";
+$assignedResult = $conn->query($assignedQuery);
+
+$assignedOrderIds = [];
+while ($row = $assignedResult->fetch_assoc()) {
+    $assignedOrderIds[] = $row['order_id'];
+}
+
+// Fetch available orders (excluding assigned ones)
+$ordersQuery = "SELECT * FROM orders";
+$ordersResult = $conn->query($ordersQuery);
+
+$availableOrders = [];
+while ($order = $ordersResult->fetch_assoc()) {
+    if (!in_array($order['order_id'], $assignedOrderIds)) {
+        $availableOrders[$order['order_id']] = [
+            'customer' => 'Customer Name', // Replace with actual customer data if available
+            'phone' => 'Customer Phone',   // Replace with actual phone if available
+            'total' => $order['totalamt_php'],
+            'date' => $order['order_date'],
+            'items' => [], // Add items if needed
+        ];
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
