@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 22, 2025 at 12:35 PM
+-- Generation Time: Jul 22, 2025 at 01:21 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -124,6 +124,8 @@ INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
 
 CREATE TABLE `customer_deletion_log` (
   `user_id` int(11) NOT NULL,
+  `first_name` varchar(45) DEFAULT NULL,
+  `last_name` varchar(45) DEFAULT NULL,
   `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -131,9 +133,9 @@ CREATE TABLE `customer_deletion_log` (
 -- Dumping data for table `customer_deletion_log`
 --
 
-INSERT INTO `customer_deletion_log` (`user_id`, `deletion_date`) VALUES
-(5, '2025-07-22 10:28:48'),
-(7, '2025-07-22 10:27:31');
+INSERT INTO `customer_deletion_log` (`user_id`, `first_name`, `last_name`, `deletion_date`) VALUES
+(8, 'Delete ', 'This', '2025-07-22 10:53:21'),
+(9, 'Delete ', 'This', '2025-07-22 10:53:00');
 
 -- --------------------------------------------------------
 
@@ -153,6 +155,13 @@ CREATE TABLE `inventory_log` (
 --
 
 INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`) VALUES
+(4, 60, -100, '2025-07-22 10:56:20'),
+(4, -100, 100, '2025-07-22 10:59:51'),
+(5, 24, -1, '2025-07-22 10:56:01'),
+(5, -1, 100, '2025-07-22 11:03:57'),
+(6, 1900, -1, '2025-07-22 10:43:02'),
+(6, -1, 100, '2025-07-22 11:04:25'),
+(8, 1200, 1201, '2025-07-22 11:01:53'),
 (11, 1, 100, '2025-07-21 20:45:23');
 
 -- --------------------------------------------------------
@@ -235,20 +244,6 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_code`, `quantit
 (1, 20, 5, 1, 7000, 7000),
 (2, 20, 3, 1, 5000, 5000);
 
---
--- Triggers `order_items`
---
-DELIMITER $$
-CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `order_items` FOR EACH ROW BEGIN
-   DECLARE available_qty INT;
-   SELECT stock_qty INTO available_qty FROM products WHERE product_code = NEW.product_code;
-   IF available_qty < NEW.quantity THEN
-      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient inventory';
-   END IF;
-END
-$$
-DELIMITER ;
-
 -- --------------------------------------------------------
 
 --
@@ -316,11 +311,11 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (1, 1, 'Sony WH-1000XM4', 'Noise Cancelling Headphones', 50, 12000),
 (2, 2, 'Samsung 27\" Monitor', '4K UHD Display', 30, 15000),
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
-(4, 4, 'Razer DeathAdder', 'Gaming Mouse', 60, 3500),
-(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 24, 7000),
-(6, 1, 'Airpods Max', 'Wireless Headphones', 1900, 35000),
+(4, 4, 'Razer DeathAdder', 'Gaming Mouse', 100, 3500),
+(5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 100, 7000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 100, 35000),
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
-(8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
+(8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1201, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
 (10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000),
 (11, 1, 'test', 'test', 100, 1),
@@ -334,6 +329,16 @@ CREATE TRIGGER `inventory_adjustment_trigger` AFTER UPDATE ON `products` FOR EAC
    IF OLD.stock_qty != NEW.stock_qty THEN
       INSERT INTO inventory_log (product_code, old_qty, new_qty, change_date)
       VALUES (NEW.product_code, OLD.stock_qty, NEW.stock_qty, current_timestamp());
+   END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `prevent_negative_inventory` BEFORE UPDATE ON `products` FOR EACH ROW BEGIN
+   DECLARE available_qty INT;
+   SELECT stock_qty INTO available_qty FROM products WHERE product_code = NEW.product_code;
+   IF available_qty > NEW.stock_qty THEN
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Insufficient inventory';
    END IF;
 END
 $$
@@ -370,8 +375,8 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 --
 DELIMITER $$
 CREATE TRIGGER `customer_deletion_log_trigger` AFTER DELETE ON `users` FOR EACH ROW BEGIN
-   INSERT INTO customer_deletion_log (user_id, deletion_date)
-   VALUES (OLD.user_id, current_timestamp());
+   INSERT INTO customer_deletion_log (user_id, first_name, last_name, deletion_date)
+   VALUES (OLD.user_id, OLD.first_name, OLD.last_name, CURRENT_TIMESTAMP());
 END
 $$
 DELIMITER ;
@@ -504,7 +509,7 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
