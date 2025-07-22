@@ -1,41 +1,47 @@
 <?php
-// Sample stock data - replace with your actual data loading
-$stockData = [
-    'Gaming Headset Pro' => ['quantity' => 15, 'category' => 'Headphones', 'price' => 199.99],
-    'Mechanical Keyboard' => ['quantity' => 8, 'category' => 'Keyboards', 'price' => 149.50],
-    'Ultra-wide Monitor' => ['quantity' => 3, 'category' => 'Monitors', 'price' => 799.99]
-];
+session_start();
+require_once 'includes/db.php';
 
-// Handle stock update
+// Handle stock update using stored procedure
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $product = $_POST['product'];
-    $quantity = intval($_POST['quantity']);
-    $action = $_POST['action'];
+    $productCode = $_POST['product_code'];
+    $newQuantity = intval($_POST['quantity']);
     
-    if (isset($stockData[$product])) {
-        if ($action === 'add') {
-            $stockData[$product]['quantity'] += $quantity;
-        } elseif ($action === 'remove') {
-            $stockData[$product]['quantity'] = max(0, $stockData[$product]['quantity'] - $quantity);
-        } elseif ($action === 'set') {
-            $stockData[$product]['quantity'] = $quantity;
+    try {
+        // Use the stored procedure instead of direct UPDATE
+        $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
+        $stmt->bind_param("si", $productCode, $newQuantity);
+        $stmt->execute();
+
+        // Check if the procedure executed successfully
+        $success = "Stock level updated successfully!";
+        
+    } catch(PDOException $e) {
+        // Handle specific error messages
+        if (strpos($e->getMessage(), 'Insufficient inventory') !== false) {
+            $error = "Error: Cannot reduce stock below current level due to inventory constraints.";
+        } else {
+            $error = "Error updating stock: " . $e->getMessage();
         }
     }
-    // Save updated data here
-    header('Location: stock_management.php');
-    exit;
 }
 
-function getStatusBadge($quantity) {
-    if ($quantity > 10) {
-        return '<span class="status-badge in-stock">In Stock</span>';
-    } elseif ($quantity > 5) {
-        return '<span class="status-badge low-stock">Low Stock</span>';
-    } elseif ($quantity > 0) {
-        return '<span class="status-badge critical">Critical</span>';
-    } else {
-        return '<span class="status-badge out-of-stock">Out of Stock</span>';
-    }
+// Fetch all products from database
+$result = $conn->query("SELECT product_code, category_code, product_name, description, stock_qty, srp_php FROM products ORDER BY product_name");
+if (!$result) {
+    die("Error fetching products: " . $conn->error);
+}
+$products = $result->fetch_all(MYSQLI_ASSOC);
+
+function getCategoryName($categoryCode) {
+    $categories = [
+        1 => 'Headphones',
+        2 => 'Monitors', 
+        3 => 'Keyboards',
+        4 => 'Gaming Mouse',
+        5 => 'Speakers'
+    ];
+    return isset($categories[$categoryCode]) ? $categories[$categoryCode] : 'Unknown';
 }
 ?>
 <!DOCTYPE html>
@@ -57,43 +63,46 @@ function getStatusBadge($quantity) {
             </nav>
         </div>
 
+        <?php if (isset($_GET['success']) && $_GET['success'] == '1'): ?>
+            <div class="alert alert-success">Stock level updated successfully!</div>
+        <?php endif; ?>
+        
+        <?php if (isset($success)): ?>
+            <div class="alert alert-success"><?php echo $success; ?></div>
+        <?php endif; ?>
+        
+        <?php if (isset($error)): ?>
+            <div class="alert alert-error"><?php echo $error; ?></div>
+        <?php endif; ?>
+
         <div class="card">
             <div class="card-header">
                 <svg class="card-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                 </svg>
-                <h2 class="card-title">Update Stock</h2>
+                <h2 class="card-title">Set Stock Level</h2>
             </div>
             
             <form method="POST" class="stock-form">
                 <div class="form-group">
                     <label class="form-label">Product</label>
-                    <select name="product" class="form-select" required>
+                    <select name="product_code" class="form-select" required>
                         <option value="">Select product</option>
-                        <?php foreach ($stockData as $product => $data): ?>
-                            <option value="<?php echo htmlspecialchars($product); ?>">
-                                <?php echo htmlspecialchars($product); ?>
+                        <?php foreach ($products as $product): ?>
+                            <option value="<?php echo htmlspecialchars($product['product_code']); ?>">
+                                <?php echo htmlspecialchars($product['product_name']); ?> 
+                                (Current: <?php echo $product['stock_qty']; ?>)
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label">Quantity</label>
+                    <label class="form-label">New Stock Level</label>
                     <input type="number" name="quantity" class="form-input" value="0" min="0" required>
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Action</label>
-                    <select name="action" class="form-select" required>
-                        <option value="">Select action</option>
-                        <option value="add">Add to Stock</option>
-                        <option value="remove">Remove from Stock</option>
-                        <option value="set">Set Stock Level</option>
-                    </select>
-                </div>
-                
-                <button type="submit" class="update-button">Update Stock</button>
+                <button type="submit" class="update-button">Set Stock Level</button>
             </form>
         </div>
 
@@ -103,26 +112,57 @@ function getStatusBadge($quantity) {
             <table class="stock-table">
                 <thead>
                     <tr>
-                        <th>Product</th>
+                        <th>Product Code</th>
+                        <th>Product Name</th>
                         <th>Category</th>
                         <th>Current Stock</th>
-                        <th>Price</th>
-                        <th>Status</th>
+                        <th>Price (PHP)</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <?php foreach ($stockData as $product => $data): ?>
+                    <?php foreach ($products as $product): ?>
                     <tr>
-                        <td class="product-name"><?php echo htmlspecialchars($product); ?></td>
-                        <td class="category-text"><?php echo htmlspecialchars($data['category']); ?></td>
-                        <td><?php echo $data['quantity']; ?></td>
-                        <td class="price-text">$<?php echo number_format($data['price'], 2); ?></td>
-                        <td><?php echo getStatusBadge($data['quantity']); ?></td>
+                        <td class="product-code"><?php echo htmlspecialchars($product['product_code']); ?></td>
+                        <td class="product-name"><?php echo htmlspecialchars($product['product_name']); ?></td>
+                        <td class="category-text"><?php echo getCategoryName($product['category_code']); ?></td>
+                        <td class="stock-quantity"><?php echo $product['stock_qty']; ?></td>
+                        <td class="price-text">₱<?php echo number_format($product['srp_php'], 2); ?></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
     </div>
+
+    <style>
+    .alert {
+        padding: 12px 16px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-weight: 500;
+    }
+    
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    
+    .alert-error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    
+    .stock-quantity {
+        font-weight: 600;
+        text-align: center;
+    }
+    
+    .product-code {
+        font-family: monospace;
+        font-weight: 500;
+    }
+    </style>
 </body>
 </html>
