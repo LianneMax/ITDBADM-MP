@@ -238,7 +238,6 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td>₱<?= number_format($p['srp_php'], 2) ?></td>
             <td><?= htmlspecialchars($p['description'] ?? '') ?></td>
             <td>
-                <a href="process/edit_product.php?id=<?= $p['product_code'] ?>" title="Edit">✏️</a>
                 <form method="POST" style="display:inline;" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
                     <input type="hidden" name="action" value="delete_product">
                     <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
