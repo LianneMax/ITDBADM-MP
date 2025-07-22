@@ -1,3 +1,29 @@
+<?php 
+session_start();
+include 'includes/db.php';
+
+// Check if staff is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: Login.php");
+    exit();
+}
+$userId = $_SESSION['user_id'];
+
+// Verify user is staff
+$userCheck = $conn->prepare("SELECT user_role FROM users WHERE user_id = ?");
+$userCheck->bind_param("i", $userId);
+$userCheck->execute();
+$userResult = $userCheck->get_result();
+$user = $userResult->fetch_assoc();
+
+if ($user['user_role'] !== 'Staff') {
+    header("Location: Login.php");
+    exit();
+}
+
+?>
+
+
 <!DOCTYPE html>
 <html>
 <head>
