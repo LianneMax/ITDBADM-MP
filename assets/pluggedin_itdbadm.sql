@@ -7,10 +7,10 @@ USE pluggedin_itdbadm;
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jul 22, 2025 at 04:36 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.2.4
+-- Host: 127.0.0.1
+-- Generation Time: Jul 22, 2025 at 06:04 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -112,17 +112,18 @@ INSERT INTO `categories` (`category_code`, `category_name`) VALUES
 CREATE TABLE `currencies` (
   `currency_code` int(11) NOT NULL,
   `price_php` varchar(45) DEFAULT NULL,
-  `currency_name` varchar(45) DEFAULT NULL
+  `currency_name` varchar(45) DEFAULT NULL,
+  `symbol` varchar(5) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;
 
 --
 -- Dumping data for table `currencies`
 --
 
-INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`) VALUES
-(1, '0.041', 'KRW'),
-(2, '57.24', 'USD'),
-(3, '1', 'PHP');
+INSERT INTO `currencies` (`currency_code`, `price_php`, `currency_name`, `symbol`) VALUES
+(1, '0.041', 'KRW', '₩'),
+(2, '57.24', 'USD', '$'),
+(3, '1', 'PHP', '₱');
 
 -- --------------------------------------------------------
 
