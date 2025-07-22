@@ -55,9 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $conn->prepare("CALL delete_product(?)");
                 $stmt->bind_param("i", $_POST['product_id']);
                 if ($stmt->execute()) {
-                    $success = "Product added successfully! Inventory trigger logged the new stock.";
+                    $success = "Product deleted successfully! Delete product trigger logged the deleted product.";
                 } else {
-                    $error = "Error adding product: " . $conn->error;
+                    $error = "Error deleting product: " . $conn->error;
                 }
                 $stmt->close();
                 break;
