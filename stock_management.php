@@ -50,6 +50,7 @@ function getCategoryName($categoryCode) {
     <title>Stock Management - Staff Dashboard</title>
     <link rel="stylesheet" href="assets/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/staff.css">
 </head>
 <body>
     <div class="dashboard-container">
@@ -133,36 +134,5 @@ function getCategoryName($categoryCode) {
             </table>
         </div>
     </div>
-
-    <style>
-    .alert {
-        padding: 12px 16px;
-        margin-bottom: 20px;
-        border-radius: 8px;
-        font-weight: 500;
-    }
-    
-    .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
-    }
-    
-    .alert-error {
-        background-color: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
-    }
-    
-    .stock-quantity {
-        font-weight: 600;
-        text-align: center;
-    }
-    
-    .product-code {
-        font-family: monospace;
-        font-weight: 500;
-    }
-    </style>
 </body>
 </html>

@@ -192,57 +192,7 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
     <title>Assigned Orders - Staff Dashboard</title>
     <link rel="stylesheet" href="assets/style.css?v=<?php echo time(); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .status-dropdown {
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            cursor: pointer;
-        }
-        .items-cell {
-            max-width: 200px;
-            word-wrap: break-word;
-            font-size: 0.9em;
-        }
-        .check-btn {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .check-btn:hover {
-            background-color: #218838;
-        }
-        .check-btn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-        .status-badge.completed {
-            background-color: #28a745;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85em;
-        }
-        .action-buttons {
-            display: flex;
-            gap: 5px;
-        }
-        .orders-section {
-            margin-bottom: 30px;
-        }
-        .section-separator {
-            margin: 40px 0;
-            border-top: 2px solid #e0e0e0;
-        }
-    </style>
+    <link rel="stylesheet" href="styles/staff.css">
 </head>
 <body>
     <div class="dashboard-container">
