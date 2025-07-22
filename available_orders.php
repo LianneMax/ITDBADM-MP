@@ -107,8 +107,6 @@ while ($order = $ordersResult->fetch_assoc()) {
     <title>Available Orders - Staff Dashboard</title>
     <link rel="stylesheet" href="assets/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/staff.css">
-    <!-- test -->
 </head>
 <body>
     <div class="dashboard-container">

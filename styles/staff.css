@@ -1,3 +1,52 @@
+/* Available orders CSS */
+        .order-details {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+        .action-form {
+            display: inline-block;
+            margin-right: 8px;
+        }
+        .assign-to-btn {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .assign-to-btn:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+        }
+        .view-btn {
+            background-color: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 6px;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .view-btn:hover {
+            background-color: #dbeafe;
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+        .items-list {
+            font-size: 12px;
+            color: #6b7280;
+        }  
+
 /* Assigned order CSS */
         .status-dropdown {
             padding: 5px;
@@ -47,56 +96,7 @@
         .section-separator {
             margin: 40px 0;
             border-top: 2px solid #e0e0e0;
-        }
-
-/* Available orders CSS */
-        .order-details {
-            font-size: 12px;
-            color: #6b7280;
-            margin-top: 4px;
-        }
-        .action-form {
-            display: inline-block;
-            margin-right: 8px;
-        }
-        .assign-to-btn {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            font-weight: 600;
-            font-size: 12px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .assign-to-btn:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-        }
-        .view-btn {
-            background-color: #f3f4f6;
-            color: #6b7280;
-            border: none;
-            border-radius: 6px;
-            width: 32px;
-            height: 32px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .view-btn:hover {
-            background-color: #dbeafe;
-            color: #2563eb;
-            transform: translateY(-1px);
-        }
-        .items-list {
-            font-size: 12px;
-            color: #6b7280;
-        }        
+        }      
 
 /* Stock management CSS */
         .alert {
