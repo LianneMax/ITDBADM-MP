@@ -211,11 +211,7 @@ if (!isset($_SESSION['user_id'])) {
                         <span class="summary-label">Shipping</span>
                         <span class="summary-value">₱15</span>
                     </div>
-                    
-                    <div class="summary-item">
-                        <span class="summary-label">Tax</span>
-                        <span class="summary-value">₱0</span>
-                    </div>
+                
 
                     <div class="summary-item total">
                         <span>Total</span>
