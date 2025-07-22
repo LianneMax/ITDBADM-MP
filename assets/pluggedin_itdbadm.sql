@@ -7,7 +7,7 @@ USE pluggedin_itdbadm;
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 22, 2025 at 07:30 PM
+-- Generation Time: Jul 22, 2025 at 08:04 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -195,6 +195,7 @@ INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`
 (6, 1900, -1, '2025-07-22 10:43:02'),
 (6, -1, 100, '2025-07-22 11:04:25'),
 (6, 100, 101, '2025-07-22 13:19:42'),
+(6, 101, 102, '2025-07-22 18:00:15'),
 (8, 1200, 1201, '2025-07-22 11:01:53'),
 (10, 800, 799, '2025-07-22 14:36:47'),
 (11, 1, 100, '2025-07-21 20:45:23'),
@@ -307,6 +308,8 @@ INSERT INTO `order_status_log` (`order_id`, `old_status`, `new_status`, `change_
 (20, 'Delivered', 'Processing', '2025-07-22 11:34:07'),
 (20, 'Processing', 'Shipped', '2025-07-22 11:34:27'),
 (20, 'Shipped', 'Delivered', '2025-07-22 11:34:43'),
+(20, 'Delivered', 'Processing', '2025-07-22 18:01:07'),
+(20, 'Processing', 'Delivered', '2025-07-22 18:01:31'),
 (24, 'Processing', 'Delivered', '2025-07-22 16:43:45'),
 (24, 'Delivered', 'Shipped', '2025-07-22 17:18:04'),
 (24, 'Shipped', 'Delivered', '2025-07-22 17:18:26');
@@ -360,7 +363,7 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (3, 3, 'Logitech MX Keys', 'Wireless Keyboard', 39, 5000),
 (4, 4, 'Razer DeathAdder', 'Gaming Mouse', 100, 3500),
 (5, 5, 'JBL Flip 5', 'Portable Bluetooth Speaker', 99, 7000),
-(6, 1, 'Airpods Max', 'Wireless Headphones', 101, 35000),
+(6, 1, 'Airpods Max', 'Wireless Headphones', 102, 35000),
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1201, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
@@ -434,7 +437,8 @@ CREATE TABLE `staff_assigned_orders` (
 --
 
 INSERT INTO `staff_assigned_orders` (`user_id`, `order_id`, `status`) VALUES
-(4, 24, 'COMPLETED');
+(4, 24, 'COMPLETED'),
+(4, 20, 'COMPLETED');
 
 --
 -- Triggers `staff_assigned_orders`
