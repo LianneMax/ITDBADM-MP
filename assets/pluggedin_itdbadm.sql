@@ -1,4 +1,3 @@
--- for eddy
 DROP DATABASE IF EXISTS pluggedin_itdbadm;
 CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pluggedin_itdbadm;
@@ -7,10 +6,10 @@ USE pluggedin_itdbadm;
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 22, 2025 at 06:04 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: localhost
+-- Generation Time: Jul 22, 2025 at 07:30 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -244,7 +243,7 @@ CREATE TABLE `orders` (
 
 INSERT INTO `orders` (`order_id`, `user_id`, `order_date`, `totalamt_php`, `order_status`, `currency_code`) VALUES
 (20, 1, '2025-07-21', 12000, 'Delivered', 3),
-(24, 1, '2025-07-22', 16000, 'Processing', 3);
+(24, 1, '2025-07-22', 16000, 'Delivered', 3);
 
 --
 -- Triggers `orders`
@@ -307,7 +306,10 @@ INSERT INTO `order_status_log` (`order_id`, `old_status`, `new_status`, `change_
 (20, 'Processing', 'Delivered', '2025-07-22 11:32:51'),
 (20, 'Delivered', 'Processing', '2025-07-22 11:34:07'),
 (20, 'Processing', 'Shipped', '2025-07-22 11:34:27'),
-(20, 'Shipped', 'Delivered', '2025-07-22 11:34:43');
+(20, 'Shipped', 'Delivered', '2025-07-22 11:34:43'),
+(24, 'Processing', 'Delivered', '2025-07-22 16:43:45'),
+(24, 'Delivered', 'Shipped', '2025-07-22 17:18:04'),
+(24, 'Shipped', 'Delivered', '2025-07-22 17:18:26');
 
 -- --------------------------------------------------------
 
@@ -424,8 +426,15 @@ CREATE TABLE `product_deletion_log` (
 CREATE TABLE `staff_assigned_orders` (
   `user_id` int(11) DEFAULT NULL,
   `order_id` int(11) DEFAULT NULL,
-  `status` varchar(50) DEFAULT NULL
+  `status` enum('ASSIGNED','COMPLETED') DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `staff_assigned_orders`
+--
+
+INSERT INTO `staff_assigned_orders` (`user_id`, `order_id`, `status`) VALUES
+(4, 24, 'COMPLETED');
 
 --
 -- Triggers `staff_assigned_orders`
@@ -439,6 +448,22 @@ CREATE TRIGGER `check_assignedorders` BEFORE INSERT ON `staff_assigned_orders` F
     ) THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Order is already assigned to a staff member.';
+    END IF;
+END
+$$
+DELIMITER ;
+DELIMITER $$
+CREATE TRIGGER `validate_order_completion` BEFORE UPDATE ON `staff_assigned_orders` FOR EACH ROW BEGIN
+    IF NEW.status = 'COMPLETED' THEN
+        IF NOT EXISTS (
+            SELECT 1 
+            FROM orders 
+            WHERE order_id = NEW.order_id 
+            AND order_status = 'Delivered'
+        ) THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Cannot mark order as COMPLETED. Order must be in Delivered status first.';
+        END IF;
     END IF;
 END
 $$
