@@ -238,7 +238,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         </option>
         <?php endwhile; ?>
       </select>
-      <input name="new_stock" type="number" placeholder="New Stock Quantity" min="0" required>
+      <input name="new_stock" type="number" placeholder="New Stock Quantity">
       <button type="submit" class="yellow-btn">Update Stock</button>
       <small>* Uses update_product_stock() procedure & inventory_adjustment_trigger</small>
     </form>
