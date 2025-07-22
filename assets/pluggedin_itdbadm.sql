@@ -1,3 +1,4 @@
+-- for juls
 DROP DATABASE IF EXISTS pluggedin_itdbadm;
 CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE pluggedin_itdbadm;
