@@ -31,6 +31,15 @@ if (!$userResult) {
     exit();
 }
 
+
+if (isset($_GET['error'])) {
+    if ($_GET['error'] === 'unauthorized') {
+        echo "<p class='error-msg'>Only customers can delete their account.</p>";
+    } elseif ($_GET['error'] === 'notfound') {
+        echo "<p class='error-msg'>User not found.</p>";
+    }
+}
+
 // Create full name from first_name and last_name
 $fullName = trim($userResult['first_name'] . ' ' . $userResult['last_name']);
 
