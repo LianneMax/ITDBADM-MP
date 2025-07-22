@@ -61,7 +61,97 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Dashboard</title>
   <link rel="stylesheet" href="styles/users.css">
+  <style>
+  .modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0; top: 0; 
+    width: 100%; height: 100%; 
+    background-color: rgba(0, 0, 0, 0.5); 
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 10% auto; 
+    padding: 20px; 
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute; 
+    top: 10px; right: 15px; 
+    font-size: 28px; 
+    cursor: pointer;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 8px;
+    font-size: 1em;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .save-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .delete-btn {
+    color: #c0392b;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  </style>
 </head>
+<!-- Edit Profile Modal -->
+<div id="editProfileModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeModal()">&times;</span>
+    <h2>Edit Profile</h2>
+    <form action="edit_profile.php" method="post">
+      
+      <div class="form-group">
+        <label for="edit_first_name">First Name</label>
+        <input type="text" id="edit_first_name" name="first_name" value="<?= htmlspecialchars($userResult['first_name']) ?>">
+      </div>
+
+      <div class="form-group">
+        <label for="edit_last_name">Last Name</label>
+        <input type="text" id="edit_last_name" name="last_name" value="<?= htmlspecialchars($userResult['last_name']) ?>">
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="save-btn">Save Changes</button>
+        <a href="delete_account.php" onclick="return confirm('Are you sure you want to delete your account?')" class="delete-btn">Delete Account</a>
+      </div>
+    </form>
+  </div>
+</div>
+
 <body>
   <div class="container">
     <!-- Back navigation -->
@@ -229,6 +319,21 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
     function confirmLogout() {
       return confirm('Are you sure you want to logout?');
     }
+
+    document.querySelector(".edit-profile-btn").addEventListener("click", function () {
+    document.getElementById("editProfileModal").style.display = "block";
+  });
+
+  function closeModal() {
+    document.getElementById("editProfileModal").style.display = "none";
+  }
+
+  window.onclick = function (event) {
+    const modal = document.getElementById("editProfileModal");
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  }
   </script>
 </body>
 </html>
