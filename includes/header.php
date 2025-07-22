@@ -3,6 +3,15 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
+
+if (file_exists('includes/db.php')) {
+    include_once('includes/db.php');
+    include_once('currency_handler.php');
+    $header_currency = getCurrencyData($conn);
+} else {
+    $header_currency = ['currency_name' => 'PHP', 'symbol' => '₱'];
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +37,9 @@ if (session_status() == PHP_SESSION_NONE) {
     <div class="icons">
         <!-- Currency Dropdown -->
         <div class="icon dropdown">
-            <button class="currency" id="currencyDropdownButton">₱ PHP <i class="fas fa-caret-down"></i></button>
+            <button class="currency" id="currencyDropdownButton">
+                <?php echo $header_currency['symbol'] . ' ' . $header_currency['currency_name']; ?> <i class="fas fa-caret-down"></i>
+            </button>
             <div class="dropdown-content" id="currencyDropdownContent">
                 <div class="dropdown-item active">₱ PHP</div>
                 <div class="dropdown-item">$ USD</div>
@@ -108,7 +119,7 @@ function loadCart() {
                     <div class="item-info">
                         <strong>${item.name}</strong>
                         <div class="item-brand">TechPeripherals</div>
-                        <p class="item-price">₱${item.price}</p>
+                        <p class="item-price">${item.price}</p>
                         <div class="quantity-controls">
                             <button class="qty-btn" onclick="updateQuantity(${item.cart_id}, ${item.quantity - 1})">−</button>
                             <span class="quantity">${item.quantity}</span>
@@ -123,18 +134,18 @@ function loadCart() {
             });
             
             // Calculate subtotal without tax
-            const subtotal = parseFloat(data.total.replace(/,/g, ''));
+            const subtotal = data.total.replace(/,/g, '');
 
             // Add cart summary (without tax)
             container.innerHTML += `
             <div class="cart-summary">
                 <div class="summary-row">
                     <span class="summary-label">Subtotal</span>
-                    <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="summary-value"> ${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
                 <div class="summary-row total-row">
                     <span class="summary-label">Total</span>
-                    <span class="summary-value">₱${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                    <span class="summary-value">${subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
                 </div>
             </div>
             `;
@@ -197,35 +208,97 @@ function loadCart() {
 
        </script>
        
-    <!-- Currency Dropdown JavaScript -->
+   <!-- Improved Currency Dropdown JavaScript -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const currencyButton = document.getElementById('currencyDropdownButton');
-        const currencyDropdown = document.getElementById('currencyDropdownContent');
-        const dropdownItems = document.querySelectorAll('.dropdown-item');
-        // Toggle dropdown
-        currencyButton.addEventListener('click', function(event) {
-            event.stopPropagation(); // prevent window click from firing
-            currencyDropdown.style.display = currencyDropdown.style.display === 'block' ? 'none' : 'block';
+document.addEventListener('DOMContentLoaded', function() {
+    const currencyButton = document.getElementById('currencyDropdownButton');
+    const currencyDropdown = document.getElementById('currencyDropdownContent');
+    const dropdownItems = document.querySelectorAll('.dropdown-item');
+    
+    // Toggle dropdown
+    currencyButton.addEventListener('click', function(event) {
+        event.stopPropagation();
+        currencyDropdown.style.display = currencyDropdown.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Function to change currency with state preservation
+    function changeCurrency(currencyId) {
+        // Save current state before currency change
+        const currentState = {
+            activeCategory: document.querySelector('.category-btn.active')?.getAttribute('data-category') || 'all',
+            searchTerm: document.querySelector('.search-bar input')?.value || '',
+            scrollPosition: window.scrollY
+        };
+        
+        // Store state in sessionStorage
+        sessionStorage.setItem('pageState', JSON.stringify(currentState));
+        
+        const formData = new FormData();
+        formData.append('action', 'change_currency');
+        formData.append('currency_id', currencyId);
+        
+        fetch('currency_handler.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                console.error('Error changing currency:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-        // Selecting currency
-        dropdownItems.forEach(item => {
-            item.addEventListener('click', function(event) {
-                event.stopPropagation();
-                dropdownItems.forEach(i => i.classList.remove('active'));
-                this.classList.add('active');
-                currencyButton.innerHTML = this.innerHTML + ' <i class="fas fa-caret-down"></i>';
-                currencyDropdown.style.display = 'none';
-            });
-        });
-        // Close dropdown if clicking outside
-        window.addEventListener('click', function(event) {
-            // Close only if click is outside dropdown
-            if (!currencyButton.contains(event.target) && !currencyDropdown.contains(event.target)) {
-                currencyDropdown.style.display = 'none';
+    }
+    
+    // Handle dropdown item clicks
+    dropdownItems.forEach(item => {
+        item.addEventListener('click', function(event) {
+            event.stopPropagation();
+            
+            // Remove active class from all items
+            dropdownItems.forEach(i => i.classList.remove('active'));
+            
+            // Add active class to clicked item
+            this.classList.add('active');
+            
+            // Update button text
+            currencyButton.innerHTML = this.innerHTML + ' <i class="fas fa-caret-down"></i>';
+            
+            // Hide dropdown
+            currencyDropdown.style.display = 'none';
+            
+            // Get currency ID based on selected text
+            const selectedText = this.textContent.trim();
+            let currencyId;
+            
+            if (selectedText.includes('KRW')) {
+                currencyId = 1;
+            } else if (selectedText.includes('USD')) {
+                currencyId = 2;
+            } else if (selectedText.includes('PHP')) {
+                currencyId = 3;
+            }
+            
+            // Change currency
+            if (currencyId) {
+                changeCurrency(currencyId);
             }
         });
     });
+    
+    // Close dropdown when clicking outside
+    window.addEventListener('click', function(event) {
+        if (!currencyButton.contains(event.target) && !currencyDropdown.contains(event.target)) {
+            currencyDropdown.style.display = 'none';
+        }
+    });
+});
 </script>
+
+
 </body>
 </html>

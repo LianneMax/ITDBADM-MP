@@ -1,6 +1,8 @@
 <?php
 session_start();
 include('includes/db.php');
+include_once('currency_handler.php');
+$current_currency = getCurrencyData($conn);
 
 header('Content-Type: application/json');
 
@@ -42,6 +44,7 @@ function getCartItems($conn, $user_id) {
     $stmt->bind_param("i", $user_id);
     $stmt->execute();
     $result = $stmt->get_result();
+    $current_currency = getCurrencyData($conn);
     
     $items = [];
     $total = 0;
@@ -52,7 +55,7 @@ function getCartItems($conn, $user_id) {
             'product_code' => $row['product_code'],
             'name' => $row['product_name'],
             'quantity' => $row['quantity'],
-            'price' => number_format($row['srp_php'], 2),
+            'price' => formatPrice($row['srp_php'], $current_currency),
             'total_price' => number_format($row['total_price'], 2),
             'stock_qty' => $row['stock_qty']
         ];
@@ -61,7 +64,7 @@ function getCartItems($conn, $user_id) {
     
     echo json_encode([
         'items' => $items,
-        'total' => number_format($total, 2),
+        'total' => formatPrice($total, $current_currency),
         'count' => count($items)
     ]);
 }

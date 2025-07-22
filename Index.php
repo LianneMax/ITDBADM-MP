@@ -1,6 +1,8 @@
 <?php 
 include('includes/header.php'); 
 include('includes/db.php');
+include_once('currency_handler.php');
+$current_currency = getCurrencyData($conn);
 
 // Fetch all products with their categories
 $sql = "SELECT p.product_code, p.product_name, p.description, p.stock_qty, p.srp_php, p.category_code, c.category_name 
@@ -100,7 +102,7 @@ if ($category_result->num_rows > 0) {
                     <?php endif; ?>
                     
                     <div class="product-price">
-                        ₱<?php echo number_format($product['srp_php'], 2); ?>
+                        <?php echo formatPrice($product['srp_php'], $current_currency); ?>
                     </div>
                     
                     <div class="product-stock <?php echo ($product['stock_qty'] <= 0) ? 'out-of-stock' : ''; ?>">
@@ -195,6 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Initialize category filter functionality
     initializeCategoryFilter();
 
+      // Restore page state after currency change
+    restorePageState();
+
     // Add to cart functionality for product cards only (exclude modal button)
     const addToCartButtons = document.querySelectorAll(".add-to-cart-btn:not([disabled]):not(#modalAddToCart)");
     addToCartButtons.forEach(button => {
@@ -228,6 +233,51 @@ document.addEventListener("DOMContentLoaded", () => {
         event.stopPropagation();
     });
 });
+
+// Function to restore page state after currency change
+function restorePageState() {
+    const savedState = sessionStorage.getItem('pageState');
+    if (savedState) {
+        try {
+            const state = JSON.parse(savedState);
+            
+            // Restore active category
+            if (state.activeCategory && state.activeCategory !== 'all') {
+                const targetCategoryBtn = document.querySelector(`.category-btn[data-category="${state.activeCategory}"]`);
+                if (targetCategoryBtn) {
+                    // Remove active class from all buttons
+                    document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                    // Add active class to target button
+                    targetCategoryBtn.classList.add('active');
+                    // Filter products
+                    filterByCategory(state.activeCategory);
+                }
+            }
+            
+            // Restore search term
+            if (state.searchTerm) {
+                const searchInput = document.querySelector('.search-bar input');
+                if (searchInput) {
+                    searchInput.value = state.searchTerm;
+                    filterProducts(state.searchTerm);
+                }
+            }
+            
+            // Restore scroll position
+            if (state.scrollPosition) {
+                setTimeout(() => {
+                    window.scrollTo(0, state.scrollPosition);
+                }, 100);
+            }
+            
+            // Clear the saved state
+            sessionStorage.removeItem('pageState');
+        } catch (error) {
+            console.error('Error restoring page state:', error);
+            sessionStorage.removeItem('pageState');
+        }
+    }
+}
 
 function initializeSearch() {
     const searchInput = document.querySelector('.search-bar input');

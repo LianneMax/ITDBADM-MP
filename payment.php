@@ -1,6 +1,9 @@
 <?php
 session_start();
 require_once 'includes/db.php';
+include_once('currency_handler.php');
+include('includes/header.php');
+$current_currency = getCurrencyData($conn);
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
@@ -209,7 +212,7 @@ if (!isset($_SESSION['user_id'])) {
                     
                     <div class="summary-item" id="shipping-row" style="display: none;">
                         <span class="summary-label">Shipping</span>
-                        <span class="summary-value">₱15</span>
+                        <span class="summary-value"><?php echo formatPrice(0,$current_currency)?></span>
                     </div>
                 
 
@@ -257,8 +260,8 @@ if (!isset($_SESSION['user_id'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    currentSubtotal = parseFloat(data.subtotal);
-                    subtotalElement.textContent = `₱${currentSubtotal}`;
+                    currentSubtotal = data.subtotal;
+                    subtotalElement.textContent = `${currentSubtotal}`; 
                     updateOrderSummary('card'); // Initialize with card payment
                 }
             })
@@ -291,19 +294,32 @@ if (!isset($_SESSION['user_id'])) {
                 shippingCard.style.display = 'none';
                 shippingRow.style.display = 'none';
             } else if (paymentMethod === 'ewallet') {
-                shipping = 15;
+                shipping = 0;
                 buttonTextValue = 'Complete Payment';
                 shippingCard.style.display = 'block';
                 shippingRow.style.display = 'flex';
             } else if (paymentMethod === 'card') {
-                shipping = 15;
+                shipping = 0;
                 buttonTextValue = 'Complete Payment';
                 shippingCard.style.display = 'block';
                 shippingRow.style.display = 'flex';
-            }
+            }   
 
-            const total = currentSubtotal + shipping;
-            totalAmount.textContent = `₱${total}`;
+            //Extract the symbol (e.g., $, ₱, etc.)
+            const currencySymbol = currentSubtotal.match(/[^0-9.,\s]+/g)?.[0] || '';
+
+            //Convert the number part to a float
+            const subtotalNumber = parseFloat(currentSubtotal.replace(/[^0-9.]/g, ''));
+
+            //Add shipping
+            const total = subtotalNumber + shipping;
+
+            //Format total with symbol and 2 decimal places
+            totalAmount.textContent = `${currencySymbol}${total.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+            })}`;
+
             buttonText.textContent = buttonTextValue;
         }
 

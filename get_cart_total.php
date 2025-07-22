@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once 'includes/db.php';
+include_once('currency_handler.php');
+$current_currency = getCurrencyData($conn);
 
 $user_id = $_SESSION['user_id'] ?? null; // Replace with actual session handling
 
@@ -16,7 +18,7 @@ try {
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
     
-    $subtotal = $row['subtotal'] ?? 0;
+    $subtotal = formatPrice($row['subtotal'], $current_currency) ?? 0;
     
     echo json_encode([
         'success' => true,
