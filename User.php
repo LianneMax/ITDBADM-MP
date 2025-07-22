@@ -281,10 +281,6 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
                     </div>
                   </div>
                 </div>
-                
-                <button class="view-details-btn" onclick="viewOrderDetails(<?= $order['order_id'] ?>)">
-                  View Details
-                </button>
               </div>
             <?php endwhile; ?>
           </div>
