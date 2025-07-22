@@ -1,9 +1,13 @@
+DROP DATABASE IF EXISTS pluggedin_itdbadm;
+CREATE DATABASE pluggedin_itdbadm CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE pluggedin_itdbadm;
+
 -- phpMyAdmin SQL Dump
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Jul 21, 2025 at 10:17 PM
+-- Generation Time: Jul 22, 2025 at 12:35 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -123,6 +127,14 @@ CREATE TABLE `customer_deletion_log` (
   `deletion_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Dumping data for table `customer_deletion_log`
+--
+
+INSERT INTO `customer_deletion_log` (`user_id`, `deletion_date`) VALUES
+(5, '2025-07-22 10:28:48'),
+(7, '2025-07-22 10:27:31');
+
 -- --------------------------------------------------------
 
 --
@@ -135,6 +147,13 @@ CREATE TABLE `inventory_log` (
   `new_qty` int(11) DEFAULT NULL,
   `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `inventory_log`
+--
+
+INSERT INTO `inventory_log` (`product_code`, `old_qty`, `new_qty`, `change_date`) VALUES
+(11, 1, 100, '2025-07-21 20:45:23');
 
 -- --------------------------------------------------------
 
@@ -187,7 +206,7 @@ DELIMITER $$
 CREATE TRIGGER `order_status_logging_trigger` AFTER UPDATE ON `orders` FOR EACH ROW BEGIN
    IF OLD.order_status != NEW.order_status THEN
       INSERT INTO order_status_log (order_id, old_status, new_status, change_date)
-      VALUES (NEW.order_id, OLD.order_status, NEW.order_status, current_timestamp());
+      VALUES (NEW.order_id, OLD.order_status, NEW.order_status, NOW());
    END IF;
 END
 $$
@@ -238,10 +257,18 @@ DELIMITER ;
 
 CREATE TABLE `order_status_log` (
   `order_id` int(11) NOT NULL,
-  `old_status` enum('paid','unpaid') DEFAULT NULL,
-  `new_status` enum('paid','unpaid') DEFAULT NULL,
+  `old_status` varchar(45) DEFAULT NULL,
+  `new_status` varchar(45) DEFAULT NULL,
   `change_date` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `order_status_log`
+--
+
+INSERT INTO `order_status_log` (`order_id`, `old_status`, `new_status`, `change_date`) VALUES
+(20, 'Delivered', 'Shipped', '2025-07-22 10:20:31'),
+(20, 'Shipped', 'Processing', '2025-07-22 10:23:45');
 
 -- --------------------------------------------------------
 
@@ -295,7 +322,9 @@ INSERT INTO `products` (`product_code`, `category_code`, `product_name`, `descri
 (7, 2, 'LG UltraGear 27GN950', 'Gaming Monitor', 1500, 25000),
 (8, 3, 'Corsair K95 RGB Platinum', 'Mechanical Gaming Keyboard', 1200, 8000),
 (9, 4, 'Logitech G502 HERO', 'High-Performance Gaming Mouse', 1000, 4000),
-(10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000);
+(10, 5, 'Bose SoundLink Revolve+', 'Portable Bluetooth Speaker', 800, 9000),
+(11, 1, 'test', 'test', 100, 1),
+(12, 4, 'test2', 'test2', 1, 1);
 
 --
 -- Triggers `products`
@@ -334,7 +363,6 @@ INSERT INTO `users` (`user_id`, `user_role`, `first_name`, `last_name`, `email`,
 (2, 'Customer', 'Max', 'Balbastro', 'maxbalbastro@gmail.com', 'ilovejuls'),
 (3, 'Admin', 'Brian', 'Lopez', 'brian_lopez@dlsu.edu.ph', 'brian'),
 (4, 'Staff', 'Carla', 'Reyes', 'carla_reyes@dlsu.edu.ph', 'carla'),
-(5, 'Customer', 'David', 'Tan', 'david_tan@dlsu.edu.ph', 'david'),
 (6, 'Customer', 'Ella', 'Santos', 'ella_santos@dlsu.edu.ph', 'ella');
 
 --
@@ -470,13 +498,13 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_code` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `product_code` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
