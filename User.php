@@ -261,29 +261,33 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
                 </div>
                 
                 <div class="order-progress">
-                  <div class="progress-step <?= !empty($order['order_date']) ? 'completed' : '' ?>">
+                  <!-- Ordered Step -->
+                  <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || !empty($order['order_date'])) ? 'completed' : '' ?>">
                     <div class="step-dot"></div>
                     <div class="step-label">
                       <span>Ordered</span>
                       <small><?= date('M j', strtotime($order['order_date'])) ?></small>
                     </div>
                   </div>
-                  
-                  <div class="progress-step <?= in_array(strtolower($order['order_status']), ['processing', 'shipped', 'completed']) ? 'completed' : '' ?>">
+
+                  <!-- Processing Step -->
+                  <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || in_array(strtolower($order['order_status']), ['processing', 'shipped', 'completed'])) ? 'completed' : '' ?>">
                     <div class="step-dot"></div>
                     <div class="step-label">
                       <span>Processing</span>
                     </div>
                   </div>
-                  
-                  <div class="progress-step <?= in_array(strtolower($order['order_status']), ['shipped', 'completed']) ? 'completed' : '' ?>">
+
+                  <!-- Shipped Step -->
+                  <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || in_array(strtolower($order['order_status']), ['shipped', 'completed'])) ? 'completed' : '' ?>">
                     <div class="step-dot"></div>
                     <div class="step-label">
                       <span>Shipped</span>
                     </div>
                   </div>
-                  
-                  <div class="progress-step <?= strtolower($order['order_status']) === 'completed' ? 'completed' : '' ?>">
+
+                  <!-- Delivered Step -->
+                  <div class="progress-step <?= strtolower($order['order_status']) === 'delivered' || strtolower($order['order_status']) === 'completed' ? 'completed' : '' ?>">
                     <div class="step-dot"></div>
                     <div class="step-label">
                       <span>Delivered</span>
@@ -326,19 +330,19 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
     }
 
     document.querySelector(".edit-profile-btn").addEventListener("click", function () {
-    document.getElementById("editProfileModal").style.display = "block";
-  });
+      document.getElementById("editProfileModal").style.display = "block";
+    });
 
-  function closeModal() {
-    document.getElementById("editProfileModal").style.display = "none";
-  }
-
-  window.onclick = function (event) {
-    const modal = document.getElementById("editProfileModal");
-    if (event.target == modal) {
-      modal.style.display = "none";
+    function closeModal() {
+      document.getElementById("editProfileModal").style.display = "none";
     }
-  }
+
+    window.onclick = function (event) {
+      const modal = document.getElementById("editProfileModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
   </script>
 </body>
 </html>
