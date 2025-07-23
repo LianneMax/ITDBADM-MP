@@ -169,8 +169,8 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 </head>
 <body>
 <div class="container">
+  <div class="user-info">
   <h2>Admin Dashboard</h2>
-  <div class="user-info">Welcome, Admin | 
     <button class="logout-btn" onclick="return confirmLogout()">
       <a href="?logout=1"> Logout </a>
     </button>
@@ -192,6 +192,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       <div class="alert alert-error"><?= $error ?></div>
     <?php endif; ?>
 
+    <div class="content-box">
     <h3>➕ Add New Product (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_product">
@@ -209,13 +210,13 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       
       <input name="srp_php" type="number" step="0.01" placeholder="Price (PHP)" required>
       <input name="stock_qty" type="number" placeholder="Stock Quantity" required>
-      <textarea name="description" placeholder="Product Description" maxlength="45"></textarea>
+      <input name="description" placeholder="Product Description" maxlength="45"></input>
       <button type="submit" class="yellow-btn">Add Product</button>
-      <small>* Uses add_new_product() procedure & inventory_adjustment_trigger</small>
     </form>
+    </div>
 
     <!-- Replace the Products table section with this: -->
-
+    <div class="content-box">
     <h3>📦 Product List</h3>
     <div class="table-container">
       <table>
@@ -251,11 +252,14 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         </tbody>
       </table>
     </div>
+    </div>
       
   </div>
 
   <!-- Stock Tab -->
+
   <div id="stock" class="tab-content">
+  <div class="content-box">
   <h3>🔄 Update Stock (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="update_stock">
@@ -272,9 +276,10 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       </select>
       <input name="new_stock" type="number" placeholder="New Stock Quantity">
       <button type="submit" class="yellow-btn">Update Stock</button>
-      <br><small>* Uses update_product_stock() procedure & inventory_adjustment_trigger</small>
     </form>
+    </div>
 
+    <div class="content-box">
     <h3>📊 Low Stock Alert</h3>
     <div class="table-container">
       <table>
@@ -306,10 +311,12 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         </tbody>
       </table>
     </div>
+    </div>
   </div>
 
   <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
+    <div class="content-box">
     <h3>👤 Add New Staff</h3>
     <form method="POST" class="form-grid single-rom">
       <input type="hidden" name="action" value="add_staff">
@@ -323,8 +330,10 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       </select>
       <button type="submit" class="yellow-btn">Add Staff Member</button>
     </form>
+    </div>
 
-    <<h3>📋 Staff List</h3>
+    <div class="content-box">
+    <h3>📋 Staff List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -349,8 +358,10 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         </tbody>
       </table>
     </div>
+    </div>
 
-    <br><h3>🗑️ Delete Customer Account (Using Stored Procedure)</h3>
+    <div class="content-box">
+    <h3>🗑️ Delete Customer Account (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid">
       <input type="hidden" name="action" value="delete_customer">
       <select name="customer_id" required>
@@ -363,12 +374,13 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         <?php endwhile; ?>
       </select>
       <button type="submit" class="red-btn" onclick="return confirm('This will delete the customer and ALL their orders, cart items, and favorites. Continue?')">Delete Customer Account</button>
-      <small>* Uses delete_customer_account() procedure & customer_deletion_log_trigger</small>
     </form>
+    </div>
   </div>
 
   <!-- Orders Tab -->
 <div id="orders" class="tab-content">
+  <div class="content-box">
   <h3>📦 Order Management</h3>
   <div class="table-container">
     <table>
@@ -421,6 +433,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
         <?php endwhile; ?>
       </tbody>
     </table>
+    </div>
   </div>
 </div>
 
