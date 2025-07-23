@@ -44,7 +44,7 @@ try {
     
     // Add shipping for card/ewallet
     if ($payment_method === 'card' || $payment_method === 'ewallet') {
-        $total_amount += 15;
+        $total_amount += 0; // Assuming no shipping cost for now
     }
     
     // Create order

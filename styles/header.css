@@ -239,7 +239,7 @@
         }
 
         .checkout-btn {
-            font-family: 'Outfit', sans-serif;  /* Apply Outfit font */
+            font-family: 'Outfit', sans-serif;  
             width: 100%;
             padding: 16px;
             background: #f4c430;
@@ -304,7 +304,8 @@
             opacity: 1;
             visibility: visible;
         }
-/* Reset default styles */
+
+    /* Reset default styles */
         * {
             margin: 0;
             padding: 0;
@@ -312,18 +313,18 @@
         }
         /* Body and general styling */
         body {
-            font-family: 'Outfit', sans-serif;  /* Apply Outfit font */
+            font-family: 'Outfit', sans-serif; 
             background-color: #f4f4f4;
             color: #333;
             padding: 0;
-            padding-top: 80px; /* Add padding to prevent content from being hidden behind sticky header */
+            padding-top: 80px; 
         }
         /* Navbar Styling */
         header {
-            position: fixed; /* Make header fixed */
-            top: 0; /* Position at top of viewport */
-            left: 0; /* Start from left edge */
-            width: 100%; /* Full width */
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -404,7 +405,7 @@
             background-color: white;
             min-width: 160px;
             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            z-index: 1001; /* Higher than header to appear above it */
+            z-index: 1001; 
             border-radius: 8px;
             border: 1px solid #ddd;
         }
@@ -492,7 +493,6 @@
         }
 
         .search-bar input:focus {
-            border-color: #7f4af1;
             box-shadow: 0 0 0 3px rgba(127, 74, 241, 0.1);
         }
 
@@ -501,13 +501,9 @@
             transition: color 0.3s ease;
         }
 
-        .search-bar .fa-search:hover {
-            color: #7f4af1;
-        }
-
-        /* Search results highlighting (optional) */
+        /* Search results highlighting  */
         .product-card.search-highlight .product-title {
-            background-color: rgba(255, 235, 59, 0.3);
+            background-color: #ffec3d4d;
             padding: 2px 4px;
             border-radius: 3px;
         }

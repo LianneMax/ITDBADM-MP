@@ -145,7 +145,7 @@
             font-size: 14px;
             background: white;
             transition: border-color 0.2s ease, box-shadow 0.2s ease;
-            box-sizing: border-box; /* Add this line */
+            box-sizing: border-box;
         }
 
         .form-input:focus, .form-select:focus {
@@ -167,13 +167,13 @@
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px; /* Changed from 16px */
+            gap: 24px; 
         }
 
         .form-row-three {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: 24px; /* Changed from 16px */
+            gap: 24px; 
         }
 
         .info-text {
