@@ -42,30 +42,19 @@ if ($_POST['action'] === 'update_status' && isset($_POST['order_id']) && isset($
 // Handle order completion
 if ($_POST['action'] === 'complete_order' && isset($_POST['order_id'])) {
     $order_id = intval($_POST['order_id']);
-    
-    // Check if order is delivered first
-    $checkOrderQuery = "SELECT order_status FROM orders WHERE order_id = ?";
-    $checkStmt = $conn->prepare($checkOrderQuery);
-    $checkStmt->bind_param("i", $order_id);
-    $checkStmt->execute();
-    $result = $checkStmt->get_result();
-    $orderStatus = $result->fetch_assoc();
-    
-    if ($orderStatus && $orderStatus['order_status'] === 'Delivered') {
-        // Update staff_assigned_orders status to COMPLETED
-        $completeQuery = "UPDATE staff_assigned_orders SET status = 'COMPLETED' WHERE order_id = ? AND user_id = ?";
-        $completeStmt = $conn->prepare($completeQuery);
-        $completeStmt->bind_param("ii", $order_id, $userId);
+
+    // Update staff_assigned_orders status to COMPLETED
+    $completeQuery = "UPDATE staff_assigned_orders SET status = 'COMPLETED' WHERE order_id = ? AND user_id = ?";
+    $completeStmt = $conn->prepare($completeQuery);
+    $completeStmt->bind_param("ii", $order_id, $userId);
         
-        if ($completeStmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Order marked as completed successfully']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to mark order as completed']);
-        }
-        $completeStmt->close();
+    if ($completeStmt->execute()) {
+        echo json_encode(['success' => true, 'message' => 'Order marked as completed successfully']);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Order must be in Delivered status before marking as completed']);
+        echo json_encode(['success' => false, 'message' => 'Failed to mark order as completed']);
     }
+    
+    $completeStmt->close();
     $checkStmt->close();
     exit;
 }
