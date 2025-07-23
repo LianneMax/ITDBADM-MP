@@ -193,7 +193,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     <?php endif; ?>
 
     <div class="content-box">
-    <h3>➕ Add New Product (Using Stored Procedure)</h3>
+    <h3>➕  Add New Product (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_product">
       <input name="product_name" placeholder="Product Name" required>
@@ -217,7 +217,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 
     <!-- Replace the Products table section with this: -->
     <div class="content-box">
-    <h3>📦 Product List</h3>
+    <h3>📦  Product List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -240,7 +240,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td class="<?= $p['stock_qty'] <= 10 ? 'low-stock' : '' ?>"><?= $p['stock_qty'] ?></td>
             <td>₱<?= number_format($p['srp_php'], 2) ?></td>
             <td><?= htmlspecialchars($p['description'] ?? '') ?></td>
-            <td class="actions-cell">
+            <td class="actions-cell"> 🗑️
               <form method="POST" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
                 <input type="hidden" name="action" value="delete_product">
                 <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
@@ -260,7 +260,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 
   <div id="stock" class="tab-content">
   <div class="content-box">
-  <h3>🔄 Update Stock (Using Stored Procedure)</h3>
+  <h3>🔄  Update Stock (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="update_stock">
       <select name="product_code" required>
@@ -280,7 +280,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </div>
 
     <div class="content-box">
-    <h3>📊 Low Stock Alert</h3>
+    <h3>📊  Low Stock Alert</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -317,7 +317,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
     <div class="content-box">
-    <h3>👤 Add New Staff</h3>
+    <h3>👤  Add New Staff</h3>
     <form method="POST" class="form-grid single-rom">
       <input type="hidden" name="action" value="add_staff">
       <input name="first_name" placeholder="First Name" required>
@@ -333,7 +333,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </div>
 
     <div class="content-box">
-    <h3>📋 Staff List</h3>
+    <h3>📋  Staff List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -346,7 +346,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td><?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?></td>
             <td><?= htmlspecialchars($s['email']) ?></td>
             <td><?= $s['user_role'] ?></td>
-            <td class="actions-cell">
+            <td class="actions-cell"> 🗑️
               <form method="POST" onsubmit="return confirm('Delete staff member: <?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>?')">
                 <input type="hidden" name="action" value="delete_staff">
                 <input type="hidden" name="user_id" value="<?= $s['user_id'] ?>">
@@ -361,7 +361,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </div>
 
     <div class="content-box">
-    <h3>🗑️ Delete Customer Account (Using Stored Procedure)</h3>
+    <h3>🗑️  Delete Customer Account</h3>
     <form method="POST" class="form-grid">
       <input type="hidden" name="action" value="delete_customer">
       <select name="customer_id" required>
@@ -381,7 +381,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   <!-- Orders Tab -->
 <div id="orders" class="tab-content">
   <div class="content-box">
-  <h3>📦 Order Management</h3>
+  <h3>📦  Order Management</h3>
   <div class="table-container">
     <table>
       <thead>
