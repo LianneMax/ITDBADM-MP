@@ -312,7 +312,7 @@ if (!isset($_SESSION['user_id'])) {
             const subtotalNumber = parseFloat(currentSubtotal.replace(/[^0-9.]/g, ''));
 
             //Add shipping
-            const total = subtotalNumber + shipping;
+            const total = subtotalNumber + 0; // Assuming no shipping cost for now
 
             //Format total with symbol and 2 decimal places
             totalAmount.textContent = `${currencySymbol}${total.toLocaleString(undefined, {
