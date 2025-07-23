@@ -65,7 +65,7 @@
             color: #e74c3c;
         }
 
-        /* Modal Styles - Made Smaller */
+        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -277,7 +277,7 @@
         }
 
         .add-to-cart-btn i {
-           color: white !important; /* Always white */
+           color: white !important; 
            font-size: 16px;
         }
 

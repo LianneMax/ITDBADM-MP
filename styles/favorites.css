@@ -89,7 +89,7 @@ header {
     transform: translateY(-2px);
 }
 
-/* Product Grid for Favorites View (if used) */
+/* Product Grid for Favorites View */
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));

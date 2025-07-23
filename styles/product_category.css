@@ -1,6 +1,6 @@
 /* Product category styles */
 .category-btn {
-    font-family: 'Outfit', sans-serif; /* Apply Outfit font */
+    font-family: 'Outfit', sans-serif; 
     padding: 10px 20px;
     border: 1px solid #ddd;
     background-color: #fff;
@@ -18,17 +18,17 @@
     background-color: #eacb5f;
     color: white;
     border-color: #eacb5f;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
 }
 
 .category-btn i {
     font-size: 16px;
-    color: #333; /* Default color of the icon */
+    color: #333; 
 }
 
 .category-btn:hover i,
 .category-btn.active i {
-    color: white; /* Make the icon turn white on hover and active state */
+    color: white; 
 }
 
 /* Product card styles */
