@@ -43,7 +43,7 @@ if ($_POST['action'] === 'update_status' && isset($_POST['order_id']) && isset($
 if ($_POST['action'] === 'complete_order' && isset($_POST['order_id'])) {
     $order_id = intval($_POST['order_id']);
     
-    // Check if order is delivered first (based on your trigger logic)
+    // Check if order is delivered first
     $checkOrderQuery = "SELECT order_status FROM orders WHERE order_id = ?";
     $checkStmt = $conn->prepare($checkOrderQuery);
     $checkStmt->bind_param("i", $order_id);
@@ -175,7 +175,7 @@ function getStatusBadge($status) {
 }
 
 function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
-    // If assignment is completed, show read-only status
+    // If assignment is completed --> read-only
     if ($assignmentStatus === 'COMPLETED') {
         return '<span class="status-badge completed">COMPLETED</span>';
     }
@@ -205,7 +205,6 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-            <!-- Reusable staff action buttons - copy this div to all pages -->
             <div class="staff-action-buttons">
                 <a href="Index.php" class="staff-btn staff-btn-primary">
                     Go to Customer View
@@ -336,13 +335,11 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
     </div>
 
     <script>
-        // Store order data for JavaScript access (combining both active and completed orders)
         const orderData = <?php echo json_encode(array_column(array_merge($activeOrders, $completedOrders), null, 'order_id')); ?>;
 
         function viewOrder(orderId) {
             const order = orderData[orderId];
             if (order) {
-                // Format items list from the array of objects
                 let itemsList = order.items.map(item => 
                     `${item.product_name} (Qty: ${item.quantity}, ₱${item.unit_price} each, Total: ₱${item.total_price})`
                 ).join('\n');
@@ -353,7 +350,7 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
 
         function updateOrderStatus(orderId, newStatus) {
             if (confirm(`Update order ${orderId} status to ${newStatus}?`)) {
-                // Create form data
+                // Make form data
                 const formData = new FormData();
                 formData.append('action', 'update_status');
                 formData.append('order_id', orderId);
@@ -381,7 +378,7 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
 
         function completeOrder(orderId) {
             if (confirm(`Mark order ${orderId} as completed? This action cannot be undone.`)) {
-                // Create form data
+                // Make form data
                 const formData = new FormData();
                 formData.append('action', 'complete_order');
                 formData.append('order_id', orderId);

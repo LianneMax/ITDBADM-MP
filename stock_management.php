@@ -2,29 +2,27 @@
 session_start();
 require_once 'includes/db.php';
 
-// Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Handle stock update using stored procedure
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productCode = $_POST['product_code'];
     $newQuantity = intval($_POST['quantity']);
     
     try {
-        // Use the stored procedure instead of direct UPDATE
+        // Update product stock stored procedure
         $stmt = $conn->prepare("CALL update_product_stock(?, ?)");
         $stmt->bind_param("si", $productCode, $newQuantity);
         $stmt->execute();
 
-        // Check if the procedure executed successfully
+        // Checker
         $success = "Stock level updated successfully!";
         
     } catch(PDOException $e) {
-        // Handle specific error messages
+        // Error messages
         if (strpos($e->getMessage(), 'Insufficient inventory') !== false) {
             $error = "Error: Cannot reduce stock below current level due to inventory constraints.";
         } else {
@@ -63,7 +61,6 @@ function getCategoryName($categoryCode) {
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-            <!-- Reusable staff action buttons - copy this div to all pages -->
             <div class="staff-action-buttons">
                 <a href="Index.php" class="staff-btn staff-btn-primary">
                     Go to Customer View

@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['login'])) {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
-    // Prepare statement to get user data
+    // to get user data
     $stmt = $conn->prepare("SELECT user_id, password, user_role, first_name, last_name FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -92,7 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['register'])) {
         if ($stmt->num_rows > 0) {
             $register_error = "An account with this email already exists.";
         } else {
-            // Insert new user (defaulting to 'Customer' role)
+            // Insert new user (default customer role)
             $insert_stmt = $conn->prepare("INSERT INTO users (first_name, last_name, email, password, user_role) VALUES (?, ?, ?, ?, 'Customer')");
             $insert_stmt->bind_param("ssss", $firstName, $lastName, $email, $password);
             
@@ -170,7 +170,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['forgot_password'])) {
     <h1>Welcome to PluggedIn</h1>
     <p>Sign in to your account or create a new one</p>
 
-    <!-- Button group to toggle between forms -->
+    <!-- Toggle between forms -->
     <div class="btn-group">
         <button id="loginBtn" class="active" onclick="toggleForm('login')"><i class="fa fa-sign-in"></i>Sign In</button>
         <button id="registerBtn" onclick="toggleForm('register')"><i class="fa fa-user-plus"></i>Register</button>

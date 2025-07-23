@@ -6,7 +6,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'error' => 'Invalid request method']));
 }
 
-$user_id = $_SESSION['user_id'] ?? 1; // Replace with actual session handling
+$user_id = $_SESSION['user_id'] ?? 1; 
 $payment_method = $_POST['payment_method'] ?? '';
 $currency_code = 3; // PHP currency
 
@@ -114,7 +114,7 @@ try {
 } catch (Exception $e) {
     $conn->rollback();
     
-    // Log the full error for debugging
+    // Error log
     error_log("Payment processing error: " . $e->getMessage());
     error_log("Error trace: " . $e->getTraceAsString());
     

@@ -21,14 +21,14 @@ if ($user['user_role'] !== 'Admin') {
     exit();
 }
 
-// Handle logout (before any output, including HTML)
+// Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
-    header("Location: Index.php"); // Redirect to homepage
+    header("Location: Index.php"); 
     exit();
 }
 
-// Handle form submissions
+// Form submissions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch Data with proper column names
+// Fetch data with actual column names
 $products = $conn->query("
     SELECT p.*, c.category_name 
     FROM products p 
@@ -158,6 +158,55 @@ $orders = $conn->query("
 
 // Get categories for dropdown
 $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
+
+// Prepare order details
+$orderDetails = [];
+
+// Get order details with items
+$orderDetailsQuery = $conn->query("
+    SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) as customer_name,
+           p.payment_status, p.payment_method, u.email
+    FROM orders o 
+    LEFT JOIN users u ON o.user_id = u.user_id 
+    LEFT JOIN payments p ON o.order_id = p.order_id
+    ORDER BY o.order_date DESC
+");
+
+while ($order = $orderDetailsQuery->fetch_assoc()) {
+
+    // Get order items for this order
+    $orderItemsQuery = $conn->prepare("
+        SELECT oi.*, p.product_name 
+        FROM order_items oi 
+        LEFT JOIN products p ON oi.product_code = p.product_code 
+        WHERE oi.order_id = ?
+    ");
+
+    $orderItemsQuery->bind_param("i", $order['order_id']);
+    $orderItemsQuery->execute();
+    $itemsResult = $orderItemsQuery->get_result();
+    
+    $items = [];
+    while ($item = $itemsResult->fetch_assoc()) {
+        $items[] = [
+            'product_name' => $item['product_name'] ?? 'Unknown Product',
+            'quantity' => $item['quantity'],
+            'unit_price' => number_format($item['srp_php'], 2),
+            'total_price' => number_format($item['totalprice_php'], 2)
+        ];
+    }
+    
+    $orderDetails[$order['order_id']] = [
+        'customer' => $order['customer_name'] ?? 'Unknown',
+        'email' => $order['email'] ?? 'N/A',
+        'status' => $order['order_status'] ?? 'Pending',
+        'total' => number_format($order['totalamt_php'], 2),
+        'date' => $order['order_date'],
+        'payment_status' => $order['payment_status'] ?? 'Unpaid',
+        'payment_method' => $order['payment_method'] ?? 'N/A',
+        'items' => $items
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -215,7 +264,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     </form>
     </div>
 
-    <!-- Replace the Products table section with this: -->
+    <!-- Products List-->
     <div class="content-box">
     <h3>📦  Product List</h3>
     <div class="table-container">
@@ -423,11 +472,12 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
               <option value="Delivered" <?= $o['order_status'] == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
             </select>
             
-            <a href="orders/view.php?id=<?= $o['order_id'] ?>" class="view-btn" title="View Details"></a>
-            <a href="orders/delete.php?id=<?= $o['order_id'] ?>" 
-               class="delete-btn"
-               onclick="return confirm('Cancel order #<?= $o['order_id'] ?>?')"
-               title="Cancel Order"></a>
+            <button class="view-btn" onclick="viewOrderDetails(<?= $o['order_id'] ?>)" title="View Details">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+              </svg>
+          </button>
           </td>
         </tr>
         <?php endwhile; ?>
@@ -472,6 +522,22 @@ function updateOrderStatus(orderId, newStatus) {
   }
 }
 
+function viewOrderDetails(orderId) {
+    const orders = <?php echo json_encode($orderDetails); ?>;
+    const order = orders[orderId];
+    
+    if (order) {
+        let itemsList = order.items.map(item => 
+            `${item.product_name} (Qty: ${item.quantity}, ₱${item.unit_price} each, Total: ₱${item.total_price})`
+        ).join('\n');
+        
+        alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nStatus: ${order.status}\nPayment Status: ${order.payment_status}\nPayment Method: ${order.payment_method}\nTotal: ₱${order.total}\nDate: ${order.date}\n\nItems:\n${itemsList}`);
+    } else {
+        alert('Order details not found.');
+    }
+}
+
+
 function quickRestock(productCode, productName) {
   const newStock = prompt(`Enter new stock quantity for ${productName}:`);
   if (newStock && parseInt(newStock) >= 0) {
@@ -497,15 +563,6 @@ function quickRestock(productCode, productName) {
 
 function confirmLogout() {
       return confirm('Are you sure you want to logout?');
-}
-
-function closeRestockModal() {
-  // Not needed anymore since we use prompt() for quick restock
-}
-
-// Close modal when clicking outside
-window.onclick = function(event) {
-  // Not needed anymore since we removed the modal
 }
 </script>
 

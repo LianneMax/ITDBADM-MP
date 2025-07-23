@@ -327,7 +327,6 @@ function performSearch() {
     const searchInput = document.querySelector('.search-bar input');
     const searchTerm = searchInput.value.trim();
     
-    // Reset category filter to "all" when searching
     const allCategoryBtn = document.querySelector('.category-btn[data-category="all"]');
     document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
     allCategoryBtn.classList.add('active');
@@ -485,7 +484,6 @@ function decreaseQuantity() {
 }
 
 function toggleFavorite(productCode) {
-    // If no productCode is passed, use current product (modal context)
     if (!productCode && currentProduct) {
         productCode = currentProduct.product_code;
     }

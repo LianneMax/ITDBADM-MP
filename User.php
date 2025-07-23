@@ -10,11 +10,11 @@ if (isset($_GET['logout'])) {
 
 // Make sure user is logged in (before any output)
 if (!isset($_SESSION['user_id'])) {
-    header("Location: Login.php"); // Redirect to login page if not logged in
+    header("Location: Login.php"); 
     exit();
 }
 
-require_once 'includes/db.php'; // Connection to DB
+require_once 'includes/db.php'; 
 
 $userId = $_SESSION['user_id'];
 
@@ -25,7 +25,7 @@ $stmt->execute();
 $userResult = $stmt->get_result()->fetch_assoc();
 
 if (!$userResult) {
-    // User not found, redirect to login
+    // if user not found, redirect to login
     session_destroy();
     header("Location: Login.php");
     exit();
@@ -320,9 +320,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
     }
     
     function viewOrderDetails(orderId) {
-      // You can implement this function to show order details
       alert('View details for Order #' + orderId);
-      // window.location.href = 'order_details.php?order_id=' + orderId;
     }
     
     function confirmLogout() {

@@ -5,7 +5,7 @@ require_once 'includes/db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $userId = $_SESSION['user_id'];
 
-    // Sanitize input
+    // Clean input
     $firstName = isset($_POST['first_name']) ? trim($_POST['first_name']) : null;
     $lastName = isset($_POST['last_name']) ? trim($_POST['last_name']) : null;
 
@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
     $updateStmt = $conn->prepare("UPDATE users SET first_name = ?, last_name = ? WHERE user_id = ?");
     $updateStmt->bind_param("ssi", $firstName, $lastName, $userId);
     if ($updateStmt->execute()) {
-        header("Location: User.php"); // <-- Make sure this matches your dashboard filename
+        header("Location: User.php");
         exit();
     } else {
         echo "Failed to update: " . $conn->error;

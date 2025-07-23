@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session
+session_start(); 
 
 // Handle logout
 if (isset($_GET['logout'])) {
@@ -120,7 +120,6 @@ while ($order = $ordersResult->fetch_assoc()) {
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-            <!-- Reusable staff action buttons - copy this div to all pages -->
             <div class="staff-action-buttons">
                 <a href="Index.php" class="staff-btn staff-btn-primary">
                     Go to Customer View
@@ -204,12 +203,11 @@ while ($order = $ordersResult->fetch_assoc()) {
 
     <script>
         function viewOrderDetails(orderId) {
-            // In a real application, this would open a modal or redirect to a details page
             const orders = <?php echo json_encode($availableOrders); ?>;
             const order = orders[orderId];
             
             if (order) {
-                // Format items list from the array of objects
+                // Format items list 
                 let itemsList = order.items.map(item => 
                     `${item.product_name} (Qty: ${item.quantity}, ₱${item.unit_price} each, Total: ₱${item.total_price})`).join('\n');
                 alert(`Order Details:\n\nOrder ID: ${orderId}\nCustomer: ${order.customer}\nEmail: ${order.email}\nStatus: ${order.status}\nTotal: ₱${order.total}\nDate: ${order.date}\n\nItems:\n${itemsList}`);
@@ -224,7 +222,7 @@ while ($order = $ordersResult->fetch_assoc()) {
             return confirm(`Are you sure you want to assign order ${orderId} to yourself?\n\nThis will move the order to your assigned orders list.`);
         }
 
-        // Add hover effects for table rows
+        // Hover effects
         document.querySelectorAll('.stock-table tbody tr').forEach(row => {
             row.addEventListener('mouseenter', function() {
                 if (!this.querySelector('td[colspan]')) {
@@ -236,7 +234,7 @@ while ($order = $ordersResult->fetch_assoc()) {
             });
         });
 
-        // Auto-refresh page every 30 seconds to check for new orders
+        // Auto refresh to check for new orders
         setTimeout(function() {
             location.reload();
         }, 30000);

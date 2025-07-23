@@ -2,14 +2,12 @@
 session_start();
 include 'includes/db.php';
 
-// Handle logout
 if (isset($_GET['logout'])) {
     session_destroy();
     header("Location: index.php");
     exit();
 }
 
-// Check if staff is logged in
 if (!isset($_SESSION['user_id'])) {
     header("Location: Login.php");
     exit();
@@ -42,8 +40,7 @@ if ($user['user_role'] !== 'Staff') {
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-            
-            <!-- Reusable staff action buttons - copy this div to all pages -->
+        
             <div class="staff-action-buttons">
                 <a href="Index.php" class="staff-btn staff-btn-primary">
                     Go to Customer View
