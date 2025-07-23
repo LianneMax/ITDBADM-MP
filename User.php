@@ -1,3 +1,4 @@
+
 <?php
 session_start(); // Start the session
 
@@ -15,7 +16,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 require_once 'includes/db.php'; 
-
+include_once('currency_handler.php');
+$current_currency = getCurrencyData($conn);
 $userId = $_SESSION['user_id'];
 
 // Fetch user profile
@@ -254,7 +256,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
                 </div>
                 
                 <div class="order-amount">
-                  <span class="amount">₱<?= number_format($order['totalamt_php'], 2) ?></span>
+                  <span class="amount"><?= formatPrice($order['totalamt_php'], $current_currency) ?></span>
                   <?php if ($order['currency_name'] && $order['currency_name'] !== 'PHP'): ?>
                     <span class="currency-note">Original: <?= htmlspecialchars($order['currency_name']) ?></span>
                   <?php endif; ?>
