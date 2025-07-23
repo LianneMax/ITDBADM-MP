@@ -2,6 +2,13 @@
 session_start();
 require_once 'includes/db.php';
 
+// Handle logout
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: index.php");
+    exit();
+}
+
 // Handle stock update using stored procedure
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $productCode = $_POST['product_code'];
@@ -48,7 +55,7 @@ function getCategoryName($categoryCode) {
 <html>
 <head>
     <title>Stock Management - Staff Dashboard</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <link rel="stylesheet" href="styles/staff_main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/staff.css">
 </head>
@@ -56,7 +63,16 @@ function getCategoryName($categoryCode) {
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-            
+            <!-- Reusable staff action buttons - copy this div to all pages -->
+            <div class="staff-action-buttons">
+                <a href="Index.php" class="staff-btn staff-btn-primary">
+                    Go to Customer View
+                </a>
+                <a href="?logout=true" class="staff-btn staff-btn-secondary" 
+                   onclick="return confirm('Are you sure you want to logout?');">
+                    Logout
+                </a>
+            </div>
             <nav class="tab-navigation">
                 <a href="stock_management.php" class="tab-nav-item active">Stock Management</a>
                 <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>

@@ -191,9 +191,9 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
     <?php if (isset($error)): ?>
       <div class="alert alert-error"><?= $error ?></div>
     <?php endif; ?>
-    
-    <form method="POST" class="form-grid">
-      <h3>➕ Add New Product (Using Stored Procedure)</h3>
+
+    <h3>➕ Add New Product (Using Stored Procedure)</h3>
+    <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_product">
       <input name="product_name" placeholder="Product Name" required>
       
@@ -213,6 +213,8 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       <button type="submit" class="yellow-btn">Add Product</button>
       <small>* Uses add_new_product() procedure & inventory_adjustment_trigger</small>
     </form>
+
+    <!-- Replace the Products table section with this: -->
 
     <h3>📦 Product List</h3>
     <div class="table-container">
@@ -237,24 +239,25 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td class="<?= $p['stock_qty'] <= 10 ? 'low-stock' : '' ?>"><?= $p['stock_qty'] ?></td>
             <td>₱<?= number_format($p['srp_php'], 2) ?></td>
             <td><?= htmlspecialchars($p['description'] ?? '') ?></td>
-            <td>
-                <form method="POST" style="display:inline;" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
-                    <input type="hidden" name="action" value="delete_product">
-                    <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
-                    <button type="submit" style="background:none;border:none;cursor:pointer;" title="Delete">🗑️</button>
-                </form>
+            <td class="actions-cell">
+              <form method="POST" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
+                <input type="hidden" name="action" value="delete_product">
+                <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
+                <button type="submit" class="delete-btn" title="Delete"></button>
+              </form>
             </td>
           </tr>
           <?php endwhile; ?>
         </tbody>
       </table>
     </div>
+      
   </div>
 
   <!-- Stock Tab -->
   <div id="stock" class="tab-content">
-    <form method="POST">
-      <h3>🔄 Update Stock (Using Stored Procedure)</h3>
+  <h3>🔄 Update Stock (Using Stored Procedure)</h3>
+    <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="update_stock">
       <select name="product_code" required>
         <option value="">Select Product</option>
@@ -269,7 +272,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       </select>
       <input name="new_stock" type="number" placeholder="New Stock Quantity">
       <button type="submit" class="yellow-btn">Update Stock</button>
-      <small>* Uses update_product_stock() procedure & inventory_adjustment_trigger</small>
+      <br><small>* Uses update_product_stock() procedure & inventory_adjustment_trigger</small>
     </form>
 
     <h3>📊 Low Stock Alert</h3>
@@ -307,8 +310,8 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
 
   <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
-    <form method="POST" class="form-grid">
-      <h3>👤 Add New Staff</h3>
+    <h3>👤 Add New Staff</h3>
+    <form method="POST" class="form-grid single-rom">
       <input type="hidden" name="action" value="add_staff">
       <input name="first_name" placeholder="First Name" required>
       <input name="last_name" placeholder="Last Name" required>
@@ -321,7 +324,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       <button type="submit" class="yellow-btn">Add Staff Member</button>
     </form>
 
-    <h3>📋 Staff List</h3>
+    <<h3>📋 Staff List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -334,11 +337,11 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
             <td><?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?></td>
             <td><?= htmlspecialchars($s['email']) ?></td>
             <td><?= $s['user_role'] ?></td>
-            <td>
-              <form method="POST" style="display:inline;" onsubmit="return confirm('Delete staff member: <?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>?')">
+            <td class="actions-cell">
+              <form method="POST" onsubmit="return confirm('Delete staff member: <?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>?')">
                 <input type="hidden" name="action" value="delete_staff">
                 <input type="hidden" name="user_id" value="<?= $s['user_id'] ?>">
-                <button type="submit" style="background:none;border:none;cursor:pointer;" title="Delete">🗑️</button>
+                <button type="submit" class="delete-btn" title="Delete"></button>
               </form>
             </td>
           </tr>
@@ -347,7 +350,7 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
       </table>
     </div>
 
-    <h3>🗑️ Delete Customer Account (Using Stored Procedure)</h3>
+    <br><h3>🗑️ Delete Customer Account (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid">
       <input type="hidden" name="action" value="delete_customer">
       <select name="customer_id" required>
@@ -365,59 +368,62 @@ $categories = $conn->query("SELECT * FROM categories ORDER BY category_name");
   </div>
 
   <!-- Orders Tab -->
-  <div id="orders" class="tab-content">
-    <h3>📦 Order Management</h3>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Order ID</th>
-            <th>Customer</th>
-            <th>Total (PHP)</th>
-            <th>Order Status</th>
-            <th>Payment Status</th>
-            <th>Payment Method</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php while ($o = $orders->fetch_assoc()): ?>
-          <tr>
-            <td><?= $o['order_id'] ?></td>
-            <td><?= htmlspecialchars($o['customer_name'] ?? 'Unknown') ?></td>
-            <td>₱<?= number_format($o['totalamt_php'], 2) ?></td>
-            <td>
-              <span class="status <?= strtolower($o['order_status'] ?? 'pending') ?>">
-                <?= strtoupper($o['order_status'] ?? 'PENDING') ?>
-              </span>
-            </td>
-            <td>
-              <span class="payment-status <?= strtolower($o['payment_status'] ?? 'unpaid') ?>">
-                <?= strtoupper($o['payment_status'] ?? 'UNPAID') ?>
-              </span>
-            </td>
-            <td><?= strtoupper($o['payment_method'] ?? 'N/A') ?></td>
-            <td><?= $o['order_date'] ?></td>
-            <td>
-              <a href="orders/view.php?id=<?= $o['order_id'] ?>" title="View Details">👁️</a>
-              <select onchange="updateOrderStatus(<?= $o['order_id'] ?>, this.value)" class="status-select">
-                <option value="">Update Status</option>
-                <option value="Processing" <?= $o['order_status'] == 'Processing' ? 'selected' : '' ?>>Processing</option>
-                <option value="Shipped" <?= $o['order_status'] == 'Shipped' ? 'selected' : '' ?>>Shipped</option>
-                <option value="Delivered" <?= $o['order_status'] == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
-              </select>
-              <a href="orders/delete.php?id=<?= $o['order_id'] ?>" 
-                 onclick="return confirm('Cancel order #<?= $o['order_id'] ?>?')"
-                 title="Cancel Order">🗑️</a>
-            </td>
-          </tr>
-          <?php endwhile; ?>
-        </tbody>
-      </table>
-    </div>
+<div id="orders" class="tab-content">
+  <h3>📦 Order Management</h3>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Total (PHP)</th>
+          <th>Order Status</th>
+          <th>Payment Status</th>
+          <th>Payment Method</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php while ($o = $orders->fetch_assoc()): ?>
+        <tr>
+          <td><?= $o['order_id'] ?></td>
+          <td><?= htmlspecialchars($o['customer_name'] ?? 'Unknown') ?></td>
+          <td>₱<?= number_format($o['totalamt_php'], 2) ?></td>
+          <td>
+            <span class="status <?= strtolower($o['order_status'] ?? 'pending') ?>">
+              <?= strtoupper($o['order_status'] ?? 'PENDING') ?>
+            </span>
+          </td>
+          <td>
+            <span class="payment-status <?= strtolower($o['payment_status'] ?? 'unpaid') ?>">
+              <?= strtoupper($o['payment_status'] ?? 'UNPAID') ?>
+            </span>
+          </td>
+          <td><?= strtoupper($o['payment_method'] ?? 'N/A') ?></td>
+          <td><?= $o['order_date'] ?></td>
+          <td class="actions-cell single-row">
+  
+            <select onchange="updateOrderStatus(<?= $o['order_id'] ?>, this.value)" class="status-select">
+              <option value="">Update Status</option>
+              <option value="Processing" <?= $o['order_status'] == 'Processing' ? 'selected' : '' ?>>Processing</option>
+              <option value="Shipped" <?= $o['order_status'] == 'Shipped' ? 'selected' : '' ?>>Shipped</option>
+              <option value="Delivered" <?= $o['order_status'] == 'Delivered' ? 'selected' : '' ?>>Delivered</option>
+            </select>
+            
+            <a href="orders/view.php?id=<?= $o['order_id'] ?>" class="view-btn" title="View Details"></a>
+            <a href="orders/delete.php?id=<?= $o['order_id'] ?>" 
+               class="delete-btn"
+               onclick="return confirm('Cancel order #<?= $o['order_id'] ?>?')"
+               title="Cancel Order"></a>
+          </td>
+        </tr>
+        <?php endwhile; ?>
+      </tbody>
+    </table>
   </div>
 </div>
+
 
 <script>
 function showTab(tabId) {
