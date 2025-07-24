@@ -243,7 +243,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
     <?php endif; ?>
 
     <div class="content-box">
-    <h3><i class="fas fa-plus product-icon"></i> Add New Product (Using Stored Procedure)</h3>
+    <h3><i class="fas fa-plus"></i> Add New Product (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_product">
       <input name="product_name" placeholder="Product Name" required>
@@ -267,7 +267,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
 
     <!-- Products List-->
     <div class="content-box">
-    <h3><i class="fas fa-cube product-icon"></i> Product List</h3>
+    <h3><i class="fas fa-cube"></i> Product List</h3>
     <div class="table-container">
       <table>
         <thead>
