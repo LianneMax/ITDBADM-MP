@@ -215,6 +215,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
   <meta charset="UTF-8">
   <title>Admin Dashboard</title>
   <link rel="stylesheet" href="styles/admin.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
 <div class="container">
@@ -242,7 +243,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
     <?php endif; ?>
 
     <div class="content-box">
-    <h3>➕  Add New Product (Using Stored Procedure)</h3>
+    <h3><i class="fas fa-plus product-icon"></i> Add New Product (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_product">
       <input name="product_name" placeholder="Product Name" required>
@@ -266,7 +267,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
 
     <!-- Products List-->
     <div class="content-box">
-    <h3>📦  Product List</h3>
+    <h3><i class="fas fa-cube product-icon"></i> Product List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -289,12 +290,16 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
             <td class="<?= $p['stock_qty'] <= 10 ? 'low-stock' : '' ?>"><?= $p['stock_qty'] ?></td>
             <td>₱<?= number_format($p['srp_php'], 2) ?></td>
             <td><?= htmlspecialchars($p['description'] ?? '') ?></td>
-            <td class="actions-cell"> 🗑️
-              <form method="POST" onsubmit="return confirm('Delete product: <?= htmlspecialchars($p['product_name']) ?>? This will remove it from all carts, favorites, and order history.')">
+            <td class="actions-cell">
+              <form method="POST" id="delete-product-<?= $p['product_code'] ?>" style="display: none;">
                 <input type="hidden" name="action" value="delete_product">
                 <input type="hidden" name="product_id" value="<?= $p['product_code'] ?>">
-                <button type="submit" class="delete-btn" title="Delete"></button>
               </form>
+              <i class="fas fa-trash-alt delete-icon" 
+                 title="Delete" 
+                 onclick="deleteProduct(<?= $p['product_code'] ?>, '<?= htmlspecialchars($p['product_name']) ?>')" 
+                 style="cursor: pointer; color: #dc3545;">
+              </i>
             </td>
           </tr>
           <?php endwhile; ?>
@@ -309,7 +314,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
 
   <div id="stock" class="tab-content">
   <div class="content-box">
-  <h3>🔄  Update Stock (Using Stored Procedure)</h3>
+  <h3><i class="fas fa-sync-alt"></i> Update Stock (Using Stored Procedure)</h3>
     <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="update_stock">
       <select name="product_code" required>
@@ -329,7 +334,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
     </div>
 
     <div class="content-box">
-    <h3>📊  Low Stock Alert</h3>
+    <h3><i class="fas fa-chart-bar"></i> Low Stock Alert</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -366,8 +371,8 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
   <!-- Staff and Users Tab -->
   <div id="staffusers" class="tab-content">
     <div class="content-box">
-    <h3>👤  Add New Staff</h3>
-    <form method="POST" class="form-grid single-rom">
+    <h3><i class="fas fa-user-plus"></i> Add New Staff</h3>
+    <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="add_staff">
       <input name="first_name" placeholder="First Name" required>
       <input name="last_name" placeholder="Last Name" required>
@@ -382,7 +387,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
     </div>
 
     <div class="content-box">
-    <h3>📋  Staff List</h3>
+    <h3><i class="fas fa-clipboard-list"></i> Staff List</h3>
     <div class="table-container">
       <table>
         <thead>
@@ -395,12 +400,16 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
             <td><?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?></td>
             <td><?= htmlspecialchars($s['email']) ?></td>
             <td><?= $s['user_role'] ?></td>
-            <td class="actions-cell"> 🗑️
-              <form method="POST" onsubmit="return confirm('Delete staff member: <?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>?')">
+            <td class="actions-cell">
+              <form method="POST" id="delete-staff-<?= $s['user_id'] ?>" style="display: none;">
                 <input type="hidden" name="action" value="delete_staff">
                 <input type="hidden" name="user_id" value="<?= $s['user_id'] ?>">
-                <button type="submit" class="delete-btn" title="Delete"></button>
               </form>
+              <i class="fas fa-trash-alt delete-icon" 
+                 title="Delete" 
+                 onclick="deleteStaff(<?= $s['user_id'] ?>, '<?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>')" 
+                 style="cursor: pointer; color: #dc3545;">
+              </i>
             </td>
           </tr>
           <?php endwhile; ?>
@@ -410,8 +419,8 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
     </div>
 
     <div class="content-box">
-    <h3>🗑️  Delete Customer Account</h3>
-    <form method="POST" class="form-grid">
+    <h3><i class="fas fa-user-times"></i> Delete Customer Account</h3>
+    <form method="POST" class="form-grid single-row">
       <input type="hidden" name="action" value="delete_customer">
       <select name="customer_id" required>
         <option value="">Select Customer to Delete</option>
@@ -430,7 +439,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
   <!-- Orders Tab -->
 <div id="orders" class="tab-content">
   <div class="content-box">
-  <h3>📦  Order Management</h3>
+  <h3><i class="fas fa-box"></i> Order Management</h3>
   <div class="table-container">
     <table>
       <thead>
@@ -473,10 +482,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
             </select>
             
             <button class="view-btn" onclick="viewOrderDetails(<?= $o['order_id'] ?>)" title="View Details">
-              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-              </svg>
+              <i class="fas fa-eye"></i>
           </button>
           </td>
         </tr>
@@ -489,6 +495,18 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
 
 
 <script>
+function deleteProduct(productCode, productName) {
+  if (confirm(`Delete product: ${productName}? This will remove it from all carts, favorites, and order history.`)) {
+    document.getElementById(`delete-product-${productCode}`).submit();
+  }
+}
+
+function deleteStaff(userId, staffName) {
+  if (confirm(`Delete staff member: ${staffName}?`)) {
+    document.getElementById(`delete-staff-${userId}`).submit();
+  }
+}
+
 function showTab(tabId) {
   document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

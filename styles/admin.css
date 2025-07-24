@@ -488,3 +488,13 @@
         height: 32px;
       }
     }
+
+    .product-icon {
+      font-size: 50px; /* Adjust size */
+      color: #4CAF50;  /* Set color */
+      transition: transform 0.3s ease-in-out; /* Smooth scaling effect */
+    }
+
+    .product-icon:hover {
+      transform: scale(1.2); /* Hover effect: icon grows slightly */
+    }
