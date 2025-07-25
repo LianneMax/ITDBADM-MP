@@ -18,7 +18,7 @@ if (!isset($_SESSION['user_id'])) {
 $userId = $_SESSION['user_id'];
 
 // Handle status update
-if ($_POST['action'] === 'update_status' && isset($_POST['order_id']) && isset($_POST['new_status'])) {
+if (isset($_POST['action']) && $_POST['action'] === 'update_status' && isset($_POST['order_id']) && isset($_POST['new_status'])) {
     $order_id = intval($_POST['order_id']);
     $new_status = $_POST['new_status'];
     
@@ -40,7 +40,7 @@ if ($_POST['action'] === 'update_status' && isset($_POST['order_id']) && isset($
 }
 
 // Handle order completion
-if ($_POST['action'] === 'complete_order' && isset($_POST['order_id'])) {
+if (isset($_POST['action']) && $_POST['action'] === 'complete_order' && isset($_POST['order_id'])) {
     $order_id = intval($_POST['order_id']);
 
     // Update staff_assigned_orders status to COMPLETED
