@@ -184,6 +184,14 @@ let currentProduct = null;
 // Store products data for modal
 const productsData = <?php echo json_encode($products); ?>;
 
+// Add currency data for JavaScript
+const currencyData = {
+    currency_code: <?php echo $current_currency['currency_code']; ?>,
+    currency_name: '<?php echo $current_currency['currency_name']; ?>',
+    symbol: '<?php echo $current_currency['symbol']; ?>',
+    price_php: <?php echo $current_currency['price_php']; ?>
+};
+
 // Store favorite states
 let favoriteStates = {};
 
@@ -421,11 +429,16 @@ function openProductModal(productCode) {
     if (!product) return;
 
     currentProduct = product;
+
+    const convertedPrice = product.srp_php / currencyData.price_php;
     
     // Populate modal with product data
     document.getElementById('modalProductName').textContent = product.product_name;
     document.getElementById('modalDescription').textContent = product.description || 'Professional studio headphones for music production and critical listening.';
-    document.getElementById('modalPrice').textContent = '₱' + Number(product.srp_php).toLocaleString();
+    document.getElementById('modalPrice').textContent = currencyData.symbol + parseFloat(convertedPrice.toFixed(2)).toLocaleString('en-US', {
+        minimumFractionDigits: 2, 
+        maximumFractionDigits: 2
+         });
     
     // Update stock information
     const stockElement = document.getElementById('modalStock');
