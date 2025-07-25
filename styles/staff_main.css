@@ -266,8 +266,9 @@ body {
 }
 
 .view-btn:hover {
-    background-color: #dbeafe;
-    color: #2563eb;
+        background-color: #eacb5f; 
+        color: white;
+        transform: translateY(-1px);
 }
 
 .edit-btn:hover {

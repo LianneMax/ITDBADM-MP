@@ -298,7 +298,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
               <i class="fas fa-trash-alt delete-icon" 
                  title="Delete" 
                  onclick="deleteProduct(<?= $p['product_code'] ?>, '<?= htmlspecialchars($p['product_name']) ?>')" 
-                 style="cursor: pointer; color: #dc3545;">
+                 style="cursor: pointer; color: #991b1b">
               </i>
             </td>
           </tr>
@@ -408,7 +408,7 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
               <i class="fas fa-trash-alt delete-icon" 
                  title="Delete" 
                  onclick="deleteStaff(<?= $s['user_id'] ?>, '<?= htmlspecialchars($s['first_name'] . ' ' . $s['last_name']) ?>')" 
-                 style="cursor: pointer; color: #dc3545;">
+                 style="cursor: pointer; color: #991b1b">
               </i>
             </td>
           </tr>

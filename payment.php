@@ -13,21 +13,20 @@ if (!isset($_SESSION['user_id'])) {
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <title>Checkout</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout</title>
     <link rel="stylesheet" href="styles/payment.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="checkout-container">
         <!-- Header -->
-        <div class="checkout-header">
-            <a href="Index.php" class="back-button">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H6m0 0l6-6m-6 6l6 6"/>
-                </svg>
-                Back to Shop
-            </a>
+        <div class="back-nav">
+        <a href="index.php" class="back-btn">
+            <span class="back-arrow">←</span>
+            Back to Home
+        </a>
             <h1 class="checkout-title">Checkout</h1>
         </div>
 
@@ -36,32 +35,21 @@ if (!isset($_SESSION['user_id'])) {
                 <!-- Payment Method Card -->
                 <div class="card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
+                        <i class="fas fa-shopping-cart card-icon"></i>
                         <h2 class="card-title">Payment Method</h2>
                     </div>
 
                     <div class="payment-methods">
                         <div class="payment-method active" data-method="card">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                                <line x1="1" y1="10" x2="23" y2="10"></line>
-                            </svg>
+                            <i class="fas fa-credit-card"></i>
                             Card
                         </div>
                         <div class="payment-method" data-method="ewallet">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 2v20m8-10a8 8 0 1 0-16 0 8 8 0 0 0 16 0z"></path>
-                            </svg>
+                            <i class="fas fa-wallet"></i>
                             E-Wallet
                         </div>
                         <div class="payment-method" data-method="cash">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1v6m0 0V1m0 6v6m0-6l4.24-4.24M12 7L7.76 2.76M12 13v8m0 0v-8m0 8l4.24-4.24M12 21l-4.24-4.24"></path>
-                            </svg>
+                            <i class="fas fa-money-bill-wave"></i>
                             Cash
                         </div>
                     </div>
@@ -154,9 +142,7 @@ if (!isset($_SESSION['user_id'])) {
                 <!-- Shipping Information Card -->
                 <div class="card" id="shipping-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
-                        </svg>
+                        <i class="fas fa-shipping-fast card-icon"></i>
                         <h2 class="card-title">Shipping Information</h2>
                     </div>
 
@@ -198,9 +184,7 @@ if (!isset($_SESSION['user_id'])) {
             <div class="order-summary">
                 <div class="card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-4m-4 0V9a2 2 0 0 1 2-2v0a2 2 0 0 1 2 2v2m-4 0h4"></path>
-                        </svg>
+                        <i class="fas fa-receipt card-icon"></i>
                         <h2 class="card-title">Order Summary</h2>
                     </div>
 
@@ -221,15 +205,12 @@ if (!isset($_SESSION['user_id'])) {
                     </div>
 
                     <div class="summary-buttons">
-                        <button class="complete-button" id="complete-payment">
-                            <span id="button-text">Confirm Order</span>
+                        <button class="confirm-button" id="complete-payment">
+                            <i class="fas fa-credit-card" style="margin-right: 8px;"></i>
+                            Complete Payment
                         </button>
                         <div class="secure-checkout">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <circle cx="12" cy="16" r="1"></circle>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                            </svg>
+                            <i class="fas fa-lock"></i>
                             Secure Checkout
                         </div>
                     </div>
@@ -334,7 +315,7 @@ if (!isset($_SESSION['user_id'])) {
             // Show loading state
             const button = document.getElementById('complete-payment');
             const originalText = button.innerHTML;
-            button.innerHTML = '<span>Processing...</span>';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i><span>Processing...</span>';
             button.disabled = true;
 
             // Prepare form data
