@@ -28,19 +28,18 @@ if ($user['user_role'] !== 'Staff') {
 
 ?>
 
-
 <!DOCTYPE html>
 <html>
 <head>
     <title>Staff Dashboard</title>
-    <link rel="stylesheet" href="styles/staff_main.css">
+    <link rel="stylesheet" href="styles/staff_main.css?v=<?php echo time(); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/staff.css">
 </head>
 <body>
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h1 class="dashboard-title">Staff Dashboard</h1>
-        
             <div class="staff-action-buttons">
                 <a href="Index.php" class="staff-btn staff-btn-primary">
                     Go to Customer View
@@ -50,13 +49,13 @@ if ($user['user_role'] !== 'Staff') {
                     Logout
                 </a>
             </div>
-
-            <nav class="tab-navigation">
-                <a href="stock_management.php" class="tab-nav-item">Stock Management</a>
-                <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>
-                <a href="available_orders.php" class="tab-nav-item">Available Orders</a>
-            </nav>
         </div>
+
+        <nav class="tab-navigation">
+            <a href="stock_management.php" class="tab-nav-item">Stock Management</a>
+            <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>
+            <a href="available_orders.php" class="tab-nav-item">Available Orders</a>
+        </nav>
 
         <div class="card">
             <div class="card-header">
@@ -78,7 +77,7 @@ if ($user['user_role'] !== 'Staff') {
                 
                 <div style="padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
                     <h3 style="color: #1a202c; margin: 0 0 8px 0; font-size: 16px;">Assigned Orders</h3>
-                    <p style="color: #6b7280; margin: 0; font-size: 14px;">View and manage orders assigned to you</p>
+                    <p style="color: #6b7280; margin: 0; font-size: div;">View and manage orders assigned to you</p>
                 </div>
                 
                 <div style="padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc;">
