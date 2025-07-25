@@ -51,11 +51,12 @@ if ($user['user_role'] !== 'Staff') {
             </div>
         </div>
 
-        <nav class="tab-navigation">
-            <a href="stock_management.php" class="tab-nav-item">Stock Management</a>
-            <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>
-            <a href="available_orders.php" class="tab-nav-item">Available Orders</a>
-        </nav>
+            <nav class="tab-navigation">
+                <a href="stock_management.php" class="tab-nav-item">Stock Management</a>
+                <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>
+                <a href="available_orders.php" class="tab-nav-item active">Available Orders</a>
+            </nav>
+        </div>
 
         <div class="card">
             <div class="card-header">

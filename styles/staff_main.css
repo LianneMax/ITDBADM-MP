@@ -8,7 +8,7 @@ body {
 .dashboard-container {
     max-width: 90%;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 40px 10px;
 }
 
 .dashboard-header {
@@ -33,7 +33,7 @@ body {
     overflow: hidden;
     background-color: #e2e8f0;
     padding: 4px;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
 
 .tab-nav-item {
