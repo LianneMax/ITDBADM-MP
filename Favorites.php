@@ -1,6 +1,8 @@
 <?php
 session_start();
 include ('includes/header.php');
+include_once('currency_handler.php');
+$current_currency = getCurrencyData($conn);
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
@@ -99,7 +101,7 @@ if ($result->num_rows > 0) {
                     <?php endif; ?>
                     
                     <div class="product-price">
-                        ₱<?php echo number_format($product['srp_php'], 2); ?>
+                        <?php echo formatPrice($product['srp_php'], $current_currency); ?>
                     </div>
                     
                     <div class="product-stock <?php echo ($product['stock_qty'] <= 0) ? 'out-of-stock' : ''; ?>">
