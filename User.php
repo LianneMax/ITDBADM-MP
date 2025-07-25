@@ -1,4 +1,3 @@
-
 <?php
 session_start(); // Start the session
 
@@ -72,94 +71,228 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Dashboard</title>
   <link rel="stylesheet" href="styles/users.css">
+  <!-- Google Fonts - Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-  .modal {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 0; top: 0; 
-    width: 100%; height: 100%; 
-    background-color: rgba(0, 0, 0, 0.5); 
-  }
+    /* Global Font */
+    * {
+      font-family: 'Outfit', sans-serif;
+    }
 
-  .modal-content {
-    background-color: #fff;
-    margin: 10% auto; 
-    padding: 20px; 
-    border-radius: 10px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-  }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.3s ease;
+    }
 
-  .close-btn {
-    position: absolute; 
-    top: 10px; right: 15px; 
-    font-size: 28px; 
-    cursor: pointer;
-  }
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 0;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      animation: slideIn 0.3s ease;
+    }
 
-  .form-group {
-    margin-bottom: 15px;
-  }
+    .modal-header {
+      padding: 2rem 2rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      position: relative;
+    }
 
-  .form-group label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
+    .modal-header h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin: 0;
+      color: #374151;
+    }
 
-  .form-group input {
-    width: 100%;
-    padding: 8px;
-    font-size: 1em;
-  }
+    .close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      width: 32px;
+      height: 32px;
+      color: #9ca3af;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+    }
 
-  .modal-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+    .close-btn:hover {
+      color: #374151;
+      background: #f3f4f6;
+    }
 
-  .save-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
+    .modal-body {
+      padding: 2rem;
+    }
 
-  .delete-btn {
-    color: #c0392b;
-    text-decoration: none;
-    font-weight: bold;
-  }
+    .modal .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
 
+    .modal .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-size: 0.875rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      font-size: 1rem;
+      z-index: 1;
+    }
+
+    .modal .form-group input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      background: white;
+      color: #374151;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+
+    .modal .form-group input:focus {
+      outline: none;
+      border-color: #ecc94b;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 5rem;
+      padding: 0px;
+      max-height: 50px;
+    }
+
+    .save-btn {
+      background: #ecc94b;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;    
+    }
+
+    .save-btn:hover {
+      background: #c0a133ff;
+    }
+
+    .delete-btn {
+      background: white;
+      color: #ef4444;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 5px;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      flex: 1;
+    }
+
+    .delete-btn:hover {
+      background: #fef2f2;
+      border-color: #f87171;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
+
 <!-- Edit Profile Modal -->
 <div id="editProfileModal" class="modal">
   <div class="modal-content">
-    <span class="close-btn" onclick="closeModal()">&times;</span>
-    <h2>Edit Profile</h2>
-    <form action="edit_profile.php" method="post">
-      
-      <div class="form-group">
-        <label for="edit_first_name">First Name</label>
-        <input type="text" id="edit_first_name" name="first_name" value="<?= htmlspecialchars($userResult['first_name']) ?>">
-      </div>
+    <div class="modal-header">
+      <h2>Edit Profile</h2>
+      <button class="close-btn" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    </div>
 
-      <div class="form-group">
-        <label for="edit_last_name">Last Name</label>
-        <input type="text" id="edit_last_name" name="last_name" value="<?= htmlspecialchars($userResult['last_name']) ?>">
-      </div>
+    <div class="modal-body">
+      <form action="edit_profile.php" method="post">
+        <div class="form-group">
+          <label for="edit_first_name">First Name</label>
+          <div class="input-wrapper">
+            <div class="input-icon"><i class="fas fa-user"></i></div>
+            <input type="text" id="edit_first_name" name="first_name" value="<?= htmlspecialchars($userResult['first_name']) ?>" placeholder="Enter your first name">
+          </div>
+        </div>
 
-      <div class="modal-actions">
-        <button type="submit" class="save-btn">Save Changes</button>
-        <a href="delete_account.php" onclick="return confirm('Are you sure you want to delete your account?')" class="delete-btn">Delete Account</a>
-      </div>
-    </form>
+        <div class="form-group">
+          <label for="edit_last_name">Last Name</label>
+          <div class="input-wrapper">
+            <div class="input-icon"><i class="fas fa-user"></i></div>
+            <input type="text" id="edit_last_name" name="last_name" value="<?= htmlspecialchars($userResult['last_name']) ?>" placeholder="Enter your last name">
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="save-btn">
+            <i class="fas fa-save"></i> Save Changes
+          </button>
+          <a href="delete_account.php" onclick="return confirm('Are you sure you want to delete your account?')" class="delete-btn">
+            <i class="fas fa-trash-alt"></i> Delete Account
+          </a>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -168,7 +301,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
     <!-- Back navigation -->
     <div class="back-nav">
       <a href="index.php" class="back-btn">
-        <span class="back-arrow">←</span>
+        <span class="back-arrow"><i class="fas fa-arrow-left"></i></span>
         Back to Home
       </a>
     </div>
@@ -193,9 +326,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       <div class="profile-section">
         <div class="section-header">
           <h2>
-            <svg class="edit-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-            </svg>
+            <i class="fas fa-user-circle"></i>
             Profile Information
           </h2>
         </div>
@@ -206,7 +337,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
               <label for="full_name">Full Name</label>
               <div class="input-container">
                 <input id="full_name" type="text" value="<?= htmlspecialchars($fullName) ?>" readonly>
-                <button class="field-menu-btn">⋯</button>
+                <button class="field-menu-btn"><i class="fas fa-ellipsis-v"></i></button>
               </div>
             </div>
             
@@ -217,16 +348,14 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
           </div>
                     
           <div class="form-actions">
-            <button class="edit-profile-btn">
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m18 2 4 4-14 14H4v-4L18 2z"/>
-              </svg>
+            <button class="edit-profile-btn" onclick="openModal()">
+              <i class="fas fa-edit btn-icon"></i>
               Edit Profile
             </button>
             
             <button class="logout-btn" onclick="return confirmLogout()">
               <a href="?logout=1" style="text-decoration: none; color: inherit;">
-                Logout
+                <i class="fas fa-sign-out-alt"></i> Logout
               </a>
             </button>
           </div>
@@ -238,7 +367,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
     <div id="orders" class="tab-content">
       <div class="orders-section">
         <div class="section-header">
-          <h2>Order History</h2>
+          <h2><i class="fas fa-history"></i> Order History</h2>
         </div>
         
         <?php if ($orderResults->num_rows > 0): ?>
@@ -251,7 +380,28 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
                     <p class="order-date"><?= date('M j, Y', strtotime($order['order_date'])) ?></p>
                   </div>
                   <span class="status-badge <?= strtolower(str_replace(' ', '-', $order['order_status'])) ?>">
-                    <?= htmlspecialchars(strtoupper($order['order_status'])) ?>
+                    <?php 
+                    $status = strtolower($order['order_status']);
+                    $statusIcon = '';
+                    switch($status) {
+                      case 'pending':
+                        $statusIcon = '<i class="fas fa-clock"></i>';
+                        break;
+                      case 'processing':
+                        $statusIcon = '<i class="fas fa-cog fa-spin"></i>';
+                        break;
+                      case 'shipped':
+                        $statusIcon = '<i class="fas fa-truck"></i>';
+                        break;
+                      case 'delivered':
+                      case 'completed':
+                        $statusIcon = '<i class="fas fa-check-circle"></i>';
+                        break;
+                      default:
+                        $statusIcon = '<i class="fas fa-info-circle"></i>';
+                    }
+                    echo $statusIcon . ' ' . htmlspecialchars(strtoupper($order['order_status']));
+                    ?>
                   </span>
                 </div>
                 
@@ -265,7 +415,8 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
                 <div class="order-progress">
                   <!-- Ordered Step -->
                   <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || !empty($order['order_date'])) ? 'completed' : '' ?>">
-                    <div class="step-dot"></div>
+                    <div class="step-dot">
+                    </div>
                     <div class="step-label">
                       <span>Ordered</span>
                       <small><?= date('M j', strtotime($order['order_date'])) ?></small>
@@ -274,7 +425,8 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
 
                   <!-- Processing Step -->
                   <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || in_array(strtolower($order['order_status']), ['processing', 'shipped', 'completed'])) ? 'completed' : '' ?>">
-                    <div class="step-dot"></div>
+                    <div class="step-dot">
+                    </div>
                     <div class="step-label">
                       <span>Processing</span>
                     </div>
@@ -282,7 +434,8 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
 
                   <!-- Shipped Step -->
                   <div class="progress-step <?= (strtolower($order['order_status']) === 'delivered' || in_array(strtolower($order['order_status']), ['shipped', 'completed'])) ? 'completed' : '' ?>">
-                    <div class="step-dot"></div>
+                    <div class="step-dot">
+                    </div>
                     <div class="step-label">
                       <span>Shipped</span>
                     </div>
@@ -290,7 +443,8 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
 
                   <!-- Delivered Step -->
                   <div class="progress-step <?= strtolower($order['order_status']) === 'delivered' || strtolower($order['order_status']) === 'completed' ? 'completed' : '' ?>">
-                    <div class="step-dot"></div>
+                    <div class="step-dot">
+                    </div>
                     <div class="step-label">
                       <span>Delivered</span>
                     </div>
@@ -301,7 +455,7 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
           </div>
         <?php else: ?>
           <div class="empty-state">
-            <div class="empty-icon">📦</div>
+            <div class="empty-icon"><i class="fas fa-box-open"></i></div>
             <h3>No orders found</h3>
             <p>You haven't placed any orders yet.</p>
           </div>
@@ -329,9 +483,9 @@ $userInitials = getUserInitials($userResult['first_name'], $userResult['last_nam
       return confirm('Are you sure you want to logout?');
     }
 
-    document.querySelector(".edit-profile-btn").addEventListener("click", function () {
+    function openModal() {
       document.getElementById("editProfileModal").style.display = "block";
-    });
+    }
 
     function closeModal() {
       document.getElementById("editProfileModal").style.display = "none";
