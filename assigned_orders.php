@@ -203,6 +203,7 @@ function getStatusDropdown($currentStatus, $orderId, $assignmentStatus) {
                     Logout
                 </a>
             </div>
+        </div>
 
             <nav class="tab-navigation">
                 <a href="stock_management.php" class="tab-nav-item">Stock Management</a>

@@ -53,7 +53,7 @@ function getCategoryName($categoryCode) {
 <html>
 <head>
     <title>Stock Management - Staff Dashboard</title>
-    <link rel="stylesheet" href="styles/staff_main.css">
+    <link rel="stylesheet" href="styles/staff_main.css?v=<?php echo time(); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/staff.css">
 </head>
@@ -70,6 +70,8 @@ function getCategoryName($categoryCode) {
                     Logout
                 </a>
             </div>
+        </div>
+        
             <nav class="tab-navigation">
                 <a href="stock_management.php" class="tab-nav-item active">Stock Management</a>
                 <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>

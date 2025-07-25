@@ -112,7 +112,7 @@ while ($order = $ordersResult->fetch_assoc()) {
 <html>
 <head>
     <title>Available Orders - Staff Dashboard</title>
-    <link rel="stylesheet" href="styles/staff_main.css">
+    <link rel="stylesheet" href="styles/staff_main.css?v=<?php echo time(); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles/staff.css">
 </head>
@@ -129,6 +129,8 @@ while ($order = $ordersResult->fetch_assoc()) {
                     Logout
                 </a>
             </div>
+        </div>
+        
             <nav class="tab-navigation">
                 <a href="stock_management.php" class="tab-nav-item">Stock Management</a>
                 <a href="assigned_orders.php" class="tab-nav-item">Assigned Orders</a>

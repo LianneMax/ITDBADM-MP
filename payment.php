@@ -2,7 +2,6 @@
 session_start();
 require_once 'includes/db.php';
 include_once('currency_handler.php');
-include('includes/header.php');
 $current_currency = getCurrencyData($conn);
 
 if (!isset($_SESSION['user_id'])) {
