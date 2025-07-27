@@ -43,6 +43,13 @@ if (isset($_POST['action']) && $_POST['action'] === 'update_status' && isset($_P
 if (isset($_POST['action']) && $_POST['action'] === 'complete_order' && isset($_POST['order_id'])) {
     $order_id = intval($_POST['order_id']);
 
+    $checkOrderQuery = "SELECT order_status FROM orders WHERE order_id = ?";
+    $checkStmt = $conn->prepare($checkOrderQuery);
+    $checkStmt->bind_param("i", $order_id);
+    $checkStmt->execute();
+    $result = $checkStmt->get_result();
+    $orderStatus = $result->fetch_assoc();
+
     // Update staff_assigned_orders status to COMPLETED
     $completeQuery = "UPDATE staff_assigned_orders SET status = 'COMPLETED' WHERE order_id = ? AND user_id = ?";
     $completeStmt = $conn->prepare($completeQuery);
@@ -58,6 +65,7 @@ if (isset($_POST['action']) && $_POST['action'] === 'complete_order' && isset($_
     $checkStmt->close();
     exit;
 }
+
 
 // Fetch assigned order IDs for the current staff member
 $assignedQuery = "SELECT order_id, status FROM staff_assigned_orders WHERE user_id = ?";

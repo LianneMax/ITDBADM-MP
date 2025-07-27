@@ -356,16 +356,22 @@ while ($order = $orderDetailsQuery->fetch_assoc()) {
             <td class="low-stock"><?= $ls['stock_qty'] ?></td>
             <td><?= htmlspecialchars($ls['category_name'] ?? 'N/A') ?></td>
             <td>
-              <button onclick="quickRestock(<?= $ls['product_code'] ?>, '<?= htmlspecialchars($ls['product_name']) ?>')">
-                Quick Restock
-              </button>
+              <!-- Quick Restock Form -->
+              <form method="POST" class="form-grid single-row">
+                <input type="hidden" name="action" value="update_stock">
+                <input type="hidden" name="product_code" value="<?= $ls['product_code'] ?>">
+                <input type="number" name="new_stock" value="100" min="1" style="width: 70px; margin-right: 5px;" required>
+                <button type="submit" class="yellow-btn" title="Quick restock <?= htmlspecialchars($ls['product_name']) ?>">
+                  <i class="fas fa-plus"></i> Restock
+                </button>
+              </form>
             </td>
           </tr>
           <?php endwhile; ?>
         </tbody>
       </table>
     </div>
-    </div>
+  </div>
   </div>
 
   <!-- Staff and Users Tab -->
@@ -568,13 +574,25 @@ function quickRestock(productCode, productName) {
       method: 'POST',
       body: formData
     })
-    .then(response => response.text())
+    .then(response => {
+      // Check if response is ok
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.text();
+    })
     .then(data => {
-      alert('Stock updated successfully! Inventory adjustment logged by trigger.');
-      location.reload();
+      // Check if there's an error in the response
+      if (data.includes('Error')) {
+        alert('Error updating stock: ' + data);
+      } else {
+        alert('Stock updated successfully! Inventory adjustment logged by trigger.');
+        location.reload();
+      }
     })
     .catch(error => {
-      alert('Error updating stock');
+      console.error('Error:', error);
+      alert('Error updating stock: ' + error.message);
     });
   }
 }
