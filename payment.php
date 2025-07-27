@@ -220,6 +220,15 @@ if (!isset($_SESSION['user_id'])) {
     </div>
 
     <script>
+
+        // Add currency data for JavaScript
+        const currencyData = {
+        currency_code: <?php echo $current_currency['currency_code']; ?>,
+        currency_name: '<?php echo $current_currency['currency_name']; ?>',
+        symbol: '<?php echo $current_currency['symbol']; ?>',
+        price_php: <?php echo $current_currency['price_php']; ?>
+        };
+
         // Payment method switching
         const paymentMethods = document.querySelectorAll('.payment-method');
         const paymentContents = document.querySelectorAll('.payment-content');
@@ -330,7 +339,12 @@ if (!isset($_SESSION['user_id'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert(`Order confirmed! Order ID: ${data.order_id}\nTotal: ₱${data.total}\n\nYou will receive a confirmation email shortly.`);
+                    // Format the total with current currency
+                    const formattedTotal = currencyData.symbol + parseFloat(data.total / currencyData.price_php).toLocaleString('en-US', {
+                    minimumFractionDigits: 2, 
+                    maximumFractionDigits: 2
+                 });
+                    alert(`Order confirmed! Order ID: ${data.order_id}\nTotal: ${formattedTotal}\n\nYou will receive a confirmation email shortly.`);
                     // Redirect to success page or reload
                     window.location.href = 'Index.php'; // Redirect to home page
                 } else {
