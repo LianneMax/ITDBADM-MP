@@ -169,7 +169,6 @@ while ($order = $ordersResult->fetch_assoc()) {
                             <td class="product-name"><?php echo htmlspecialchars($orderId); ?></td>
                             <td>
                                 <div><?php echo htmlspecialchars($order['customer']); ?></div>
-                                <div class="order-details phone-number"><?php echo htmlspecialchars($order['phone']); ?></div>
                             </td>
                             <td class="price-text">₱<?php echo number_format($order['total'], 2); ?></td>
                             <td>
